@@ -10,7 +10,7 @@ const repo = 'content'
 
 export async function run() {
   try {
-    const ghKey = core.getInput('repo-token', { required: true })
+    const ghKey = core.getInput('token', { required: true })
     const configPath = core.getInput('config', { required: true })
     const file = fs.readFileSync(configPath, 'utf8')
     const labelRules = yaml.parse(file)
