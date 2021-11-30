@@ -87,5 +87,14 @@ article:
 
 ## Common Examples
 
+```yml
+editor-review:
+  files:
+    added: content/**/*.md
+  assignee: editor
+  meta:
+    tags: "article"
+```
+
 ## Comparison with other labelers
 
