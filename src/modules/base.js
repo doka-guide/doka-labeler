@@ -6,7 +6,7 @@ export class BaseModule {
     this.objects = objects
   }
 
-  isAcceptable(label) {
+  isApplicable(label) {
     return true
   }
 }
