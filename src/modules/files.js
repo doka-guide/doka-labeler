@@ -16,34 +16,24 @@ export class FilesModule extends BaseModule {
   }
 
   hasApplicableFiles(fileObjects, label, caseNumber) {
-    let config
+    let config = null
     if (caseNumber === null) {
       config = this.config[label].files
     } else {
       config = this.config[label][caseNumber].files
     }
 
-    let hasStatus = false
-    if (typeof config === 'object') {
-      FILE_STATUSES.forEach(s => {
-        if (config.hasOwnProperty(s)) {
-          hasStatus = true
-          break
-        }
-      })
-    } else if (typeof config === 'string') {
+    if (typeof config === 'string') {
       return this.areFilesApplicable(fileObjects, label, [config])
-    }
-
-    if (hasStatus) {
+    } else if (Array.isArray(config)) {
+      return this.areFilesApplicable(fileObjects, label, config)
+    } else if (typeof config === 'object') {
       const patterns = Object.keys(config)
       patterns.forEach(s => {
         if (this.areFilesApplicable(fileObjects, label, patterns[s])) {
           return true
         }
       })
-    } else if (Array.isArray(config)) {
-      return this.areFilesApplicable(fileObjects, label, config)
     }
 
     return undefined
