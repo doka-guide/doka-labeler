@@ -15,7 +15,7 @@ export class FilesModule extends BaseModule {
     return this.hasApplicableFiles(this.objects, label, caseNumber)
   }
 
-  hasApplicableFiles(fileObjects, label, caseNumber = null) {
+  hasApplicableFiles(fileObjects, label, caseNumber) {
     let config
     if (caseNumber === null) {
       config = this.config[label].files
