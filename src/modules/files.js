@@ -55,6 +55,7 @@ export class FilesModule extends BaseModule {
         filteredFiles[s] = []
       })
 
+      const fileList = []
       console.log(`Module — ${MODULE_KEY}, label - ${label}:`)
       for (const index in fileObjects.data) {
         const file = fileObjects.data[index]
