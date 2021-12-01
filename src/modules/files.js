@@ -51,10 +51,6 @@ export class FilesModule extends BaseModule {
 
   areFilesApplicable(fileObjects, label, patterns) {
     if (patterns && patterns.length > 0) {
-      FILE_STATUSES.forEach(s => {
-        filteredFiles[s] = []
-      })
-
       const fileList = []
       console.log(`Module — ${MODULE_KEY}, label - ${label}:`)
       for (const index in fileObjects.data) {
