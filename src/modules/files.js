@@ -11,7 +11,7 @@ const FILE_STATUSES = [
 export class FilesModule extends BaseModule {
   MODULE_KEY = 'files'
 
-  isAcceptable(label) {
+  isApplicable(label) {
     return this.hasApplicableFiles(this.objects, label)
   }
 
