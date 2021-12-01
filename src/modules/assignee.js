@@ -12,7 +12,7 @@ export class AssigneeModule extends BaseModule {
     }
 
     if (Array.isArray(config) && Array.isArray(this.objects)) {
-      config.forEach((a) => {
+      config.forEach(a => {
         if (this.objects.includes(a)) {
           console.log(`Module — ${MODULE_KEY}, label - ${label}: has applicable assignee`)
           return true
