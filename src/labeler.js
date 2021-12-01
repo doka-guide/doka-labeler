@@ -29,19 +29,19 @@ export async function run() {
     const repo = 'content'
 
     const pullNumber = getPrNumber()
-    const pullObject = getPullObject(owner, repo, pullNumber, token)
-    const fileObjects = getFileObjects(owner, repo, pullNumber, token)
+    const pullObject = await getPullObject(owner, repo, pullNumber, token)
+    const fileObjects = await getFileObjects(owner, repo, pullNumber, token)
     const assignee = getAssignee(pullObject)
 
     const modules = setupModules(labelRules, { fileObjects, assignee })
     const newLabels = prepareNewLabels(modules)
-    const oldLabels = getOldLabels(owner, repo, pullNumber, token)
-    const allLabels = getAllLabels(owner, repo, token)
+    const oldLabels = await getOldLabels(owner, repo, pullNumber, token)
+    const allLabels = await getAllLabels(owner, repo, token)
 
     const strategy = setupStrategy(commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
     const readyToPostLabels = mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
 
-    postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
+    await postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
   } catch (error) {
     console.log(error)
   }
@@ -52,11 +52,10 @@ const getPrNumber = () => {
   if (!pullRequest) {
     return undefined;
   }
-
   return pullRequest.number;
 }
 
-const getPullObject = (owner, repo, prNumber, ghKey) => {
+const getPullObject = async (owner, repo, prNumber, ghKey) => {
   const octokit = new Octokit({ auth: ghKey })
   return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
     owner,
@@ -65,7 +64,7 @@ const getPullObject = (owner, repo, prNumber, ghKey) => {
   })
 }
 
-const getFileObjects = (owner, repo, prNumber, ghKey) => {
+const getFileObjects = async (owner, repo, prNumber, ghKey) => {
   const octokit = new Octokit({ auth: ghKey })
   return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
     owner,
@@ -74,7 +73,7 @@ const getFileObjects = (owner, repo, prNumber, ghKey) => {
   })
 }
 
-const getOldLabels = (owner, repo, prNumber, ghKey) => {
+const getOldLabels = async (owner, repo, prNumber, ghKey) => {
   const labels = new Set([])
   const octokit = new Octokit({ auth: ghKey })
   const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
@@ -90,7 +89,7 @@ const getOldLabels = (owner, repo, prNumber, ghKey) => {
   return labels
 }
 
-const getAllLabels = (owner, repo, ghKey) => {
+const getAllLabels = async (owner, repo, ghKey) => {
   const octokit = new Octokit({ auth: ghKey })
   const labelObjects = await octokit.request('GET /repos/{owner}/{repo}/labels', {
     owner,
@@ -103,7 +102,7 @@ const getAllLabels = (owner, repo, ghKey) => {
   return labels
 }
 
-const createLabel = (owner, repo, ghKey, label) => {
+const createLabel = async (owner, repo, ghKey, label) => {
   const octokit = new Octokit({ auth: ghKey })
   await octokit.request('POST /repos/{owner}/{repo}/labels', {
     owner,
@@ -179,7 +178,7 @@ const prepareNewLabels = (modules, config) => {
   return newLabels
 }
 
-const mergeLabels = (owner, repo, ghKey, oldLabels, newLabels, strategy) => {
+const mergeLabels = async (owner, repo, ghKey, oldLabels, newLabels, strategy) => {
   const allLabels = getAllLabels(owner, repo, ghKey)
   const labels = new Set([...oldLabels])
   oldLabels.forEach(l => {
@@ -209,7 +208,7 @@ const mergeLabels = (owner, repo, ghKey, oldLabels, newLabels, strategy) => {
   return labels
 }
 
-const postNewLabels = (owner, repo, prNumber, ghKey, newLabels) => {
+const postNewLabels = async (owner, repo, prNumber, ghKey, newLabels) => {
   const octokit = new Octokit({ auth: ghKey })
   await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
     owner,
