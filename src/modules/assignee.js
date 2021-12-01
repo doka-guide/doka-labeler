@@ -3,8 +3,13 @@ import { BaseModule } from "./base.js"
 export class AssigneeModule extends BaseModule {
   MODULE_KEY = 'assignee'
 
-  isApplicable(label) {
-    const assignee = this.config[label].assignee
+  isApplicable(label, caseNumber = null) {
+    let assignee
+    if (caseNumber === null) {
+      assignee = this.config[label].assignee
+    } else {
+      assignee = this.config[label][caseNumber].assignee
+    }
 
     if (Array.isArray(assignee) && Array.isArray(this.objects)) {
       assignee.forEach((a) => {

@@ -11,12 +11,17 @@ const FILE_STATUSES = [
 export class FilesModule extends BaseModule {
   MODULE_KEY = 'files'
 
-  isApplicable(label) {
-    return this.hasApplicableFiles(this.objects, label)
+  isApplicable(label, caseNumber = null) {
+    return this.hasApplicableFiles(this.objects, label, caseNumber)
   }
 
-  hasApplicableFiles(fileObjects, label) {
-    const config = this.config[label].files
+  hasApplicableFiles(fileObjects, label, caseNumber = null) {
+    let config
+    if (caseNumber === null) {
+      config = this.config[label].files
+    } else {
+      config = this.config[label][caseNumber].files
+    }
 
     let hasStatus = false
     if (typeof config === 'object') {

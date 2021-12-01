@@ -6,7 +6,9 @@ export class BaseModule {
     this.objects = objects
   }
 
-  isApplicable(label) {
+  isApplicable(label, caseNumber = null) {
+    console.log(label)
+    if (caseNumber) console.log(caseNumber)
     return true
   }
 }
