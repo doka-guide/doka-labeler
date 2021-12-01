@@ -4,22 +4,22 @@ export class AssigneeModule extends BaseModule {
   MODULE_KEY = 'assignee'
 
   isApplicable(label, caseNumber = null) {
-    let assignee
+    let config
     if (caseNumber === null) {
-      assignee = this.config[label].assignee
+      config = this.config[label].assignee
     } else {
-      assignee = this.config[label][caseNumber].assignee
+      config = this.config[label][caseNumber].assignee
     }
 
-    if (Array.isArray(assignee) && Array.isArray(this.objects)) {
-      assignee.forEach((a) => {
+    if (Array.isArray(config) && Array.isArray(this.objects)) {
+      config.forEach((a) => {
         if (this.objects.includes(a)) {
           console.log(`Module — ${MODULE_KEY}, label - ${label}: has applicable assignee`)
           return true
         }
       })
-    } else if (typeof assignee === 'string' && Array.isArray(this.objects)) {
-      if (this.objects.includes(assignee)) {
+    } else if (typeof config === 'string' && Array.isArray(this.objects)) {
+      if (this.objects.includes(config)) {
         console.log(`Module — ${MODULE_KEY}, label - ${label}: has applicable assignee`)
         return true
       }
