@@ -1,106 +1,49 @@
-const { Octokit } = require('@octokit/core')
+import { Octokit } from '@octokit/core'
+import * as core from "@actions/core"
 import * as github from '@actions/github'
 import * as yaml from 'yaml'
-const fm = require('front-matter')
-const fs = require('fs')
+import fs from 'fs'
 
-const pullNumber = getPrNumber()
-const owner = 'doka-guide'
-const repo = 'content'
+import { BaseModule } from './modules/base.js'
+import { AssigneeModule } from './modules/assignee.js'
+import { FilesModule } from './modules/files.js'
+import { FrontmatterModule } from './modules/frontmatter.js'
+
+const DEFAULT_STRATEGY = {
+  'merge-with-others': true,
+  'completely-update': false,
+  'add-if-not-exists': false,
+  'remove-if-not-applicable': false
+}
 
 export async function run() {
   try {
-    const ghKey = core.getInput('token', { required: true })
     const configPath = core.getInput('config', { required: true })
+    const token = core.getInput('token', { required: true })
+    const commonStrategy = !!core.getInput('strategy', { required: false })
+
     const file = fs.readFileSync(configPath, 'utf8')
     const labelRules = yaml.parse(file)
 
-    const octokit = new Octokit({ auth: ghKey })
+    const owner = 'doka-guide'
+    const repo = 'content'
 
-    const pullObject = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
-      owner,
-      repo,
-      pull_number: pullNumber
-    })
+    const pullNumber = getPrNumber()
+    const pullObject = getPullObject(owner, repo, pullNumber, token)
+    const fileObjects = getFileObjects(owner, repo, pullNumber, token)
+    const assignee = getAssignee(pullObject)
 
-    const labels = new Set([])
-    for (const index in pullObject.data.labels) {
-      const labelObject = pullObject.data.labels[index]
-      labels.add(labelObject.name)
-    }
+    const modules = setupModules(labelRules, { fileObjects, assignee })
+    const newLabels = prepareNewLabels(modules)
+    const oldLabels = getOldLabels(owner, repo, pullNumber, token)
+    const allLabels = getAllLabels(owner, repo, token)
 
-    const fileObjects = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
-      owner,
-      repo,
-      pull_number: pullNumber
-    })
+    const strategy = setupStrategy(commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
+    const readyToPostLabels = mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
 
-    const files = {
-      added: [],
-      modified: [],
-      removed: [],
-      renamed: []
-    }
-
-    console.log('Files:')
-    for (const index in fileObjects.data) {
-      const file = fileObjects.data[index]
-      if (typeof file === 'object' && file.status && file.filename) {
-        console.log(file.filename, file.status)
-        files[file.status].push(file.filename)
-        if (Object.keys(labelRules).includes('meta') && (new RegExp('.+.md', 'i')).test(file.filename)) {
-          const content = fs.readFileSync(file.filename, { encoding: 'utf8', flag: 'r' })
-          const contentMeta = fm(content)
-          for (const field in labelRules.meta) {
-            if (Object.hasOwnProperty.call(labelRules.meta, field)) {
-              const fieldRules = labelRules.meta[field]
-              if (Object.keys(contentMeta).includes(field)) {
-                const metaSelectedLabels = selectLabels([file.filename], fieldRules.files)
-                metaSelectedLabels.forEach(element => {
-                  labels.add(element)
-                })
-              }
-            }
-          }
-        }
-      }
-    }
-
-    const selectedFileLabels = selectLabels(files, labelRules.files)
-    selectedFileLabels.forEach(element => {
-      labels.add(element)
-    })
-
-    if (Object.keys(pullObject).includes('assignee')) {
-      pullObject.assignee.forEach(person => {
-        if (Object.keys(labelRules.assignee).includes(person)) {
-          const assigneeSelectedLabel = selectLabels(files, labelRules.assignee[person])
-          assigneeSelectedLabel.forEach(element => {
-            labels.add(element)
-          })
-        }
-      })
-    }
-
-    const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
-      owner,
-      repo,
-      issue_number: pullNumber,
-    })
-    for (const key in oldLabelsObject) {
-      if (oldLabelsObject[key].hasOwnProperty('name') && !labels.has(oldLabelsObject[key].name)) {
-        labels.add(oldLabelsObject[key].name)
-      }
-    }
-    await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-      owner,
-      repo,
-      issue_number: pullNumber,
-      labels: [...labels]
-    })
+    postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
   } catch (error) {
-    core.error(error);
-    core.setFailed(error.message);
+    console.log(error)
   }
 }
 
@@ -113,27 +56,165 @@ const getPrNumber = () => {
   return pullRequest.number;
 }
 
-const selectLabels = (selectedFiles, selectedRules) => {
-  const output = new Set([])
-  for (const label in selectedRules) {
-    if (Object.hasOwnProperty.call(selectedRules, label)) {
-      const labelRules = selectedRules[label]
-      for (const status in labelRules) {
-        const statusRules = labelRules[status]
-        statusRules.forEach(filePattern => {
-          if (Object.keys(selectedFiles).includes(status)) {
-            const regExp = new RegExp(filePattern, 'i')
-            selectedFiles[status].forEach(fileName => {
-              const isValid = regExp.test(fileName)
-              const isNotInList = !output.has(label)
-              if (isValid && isNotInList) {
-                output.add(label)
-              }
-            })
-          }
-        })
-      }
+const getPullObject = (owner, repo, prNumber, ghKey) => {
+  const octokit = new Octokit({ auth: ghKey })
+  return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+    owner,
+    repo,
+    pull_number: prNumber
+  })
+}
+
+const getFileObjects = (owner, repo, prNumber, ghKey) => {
+  const octokit = new Octokit({ auth: ghKey })
+  return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
+    owner,
+    repo,
+    pull_number: prNumber
+  })
+}
+
+const getOldLabels = (owner, repo, prNumber, ghKey) => {
+  const labels = new Set([])
+  const octokit = new Octokit({ auth: ghKey })
+  const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+    owner,
+    repo,
+    issue_number: prNumber,
+  })
+  for (const key in oldLabelsObject) {
+    if (oldLabelsObject[key].hasOwnProperty('name') && !labels.has(oldLabelsObject[key].name)) {
+      labels.add(oldLabelsObject[key].name)
     }
   }
-  return output
+  return labels
+}
+
+const getAllLabels = (owner, repo, ghKey) => {
+  const octokit = new Octokit({ auth: ghKey })
+  const labelObjects = await octokit.request('GET /repos/{owner}/{repo}/labels', {
+    owner,
+    repo
+  })
+  const labels = new Set([])
+  labelObjects.forEach(lo => {
+    labels.add(fo.name)
+  })
+  return labels
+}
+
+const createLabel = (owner, repo, ghKey, label) => {
+  const octokit = new Octokit({ auth: ghKey })
+  await octokit.request('POST /repos/{owner}/{repo}/labels', {
+    owner,
+    repo,
+    name: label
+  })
+}
+
+const getAssignee = (pullObject) => {
+  return pullObject.assignee
+}
+
+const setupModules = (config, objects) => {
+  const modules = []
+  const moduleNames = new Set([])
+  for (const label in config) {
+    if (Object.hasOwnProperty.call(config, label)) {
+      const setupObject = config[label]
+      moduleNames.add(Object.keys(setupObject))
+    }
+  }
+
+  [...moduleNames].forEach(m => {
+    switch (m) {
+      case 'assignee':
+        modules.push(new AssigneeModule(objects.assignee, config))
+        break;
+      case 'files':
+        modules.push(new FilesModule(objects.fileObjects, config))
+        break;
+      case 'meta':
+        modules.push(new FrontmatterModule(objects.fileObjects, config))
+        break;
+    }
+  })
+
+  return modules
+}
+
+const setupStrategy = (commonStrategy, config) => {
+  const resultedStrategy = {}
+  const labels = Object.keys(config)
+  labels.forEach(l => {
+    const labelConfig = config[l]
+    if (labelConfig.hasOwnProperty('strategy')) {
+      resultedStrategy[l] = Object.assign(commonStrategy, labelConfig['strategy'])
+    } else {
+      resultedStrategy[l] = commonStrategy
+    }
+  })
+  return resultedStrategy
+}
+
+const prepareNewLabels = (modules, config) => {
+  const newLabels = new Set([])
+  const labels = Object.keys(config)
+  labels.forEach(l => {
+    let result = false
+    modules.forEach(m => {
+      if (m instanceof BaseModule) {
+        const labelConfigArray = config[l]
+        if (Array.isArray(labelConfigArray)) {
+          labelConfigArray.forEach((_, i) => {
+            result = result || m.isApplicable(l, i)
+          })
+        } else if (typeof labelConfigArray === 'object') {
+          result = result && m.isApplicable(l)
+        }
+      }
+    })
+    if (result) newLabels.add(l)
+  })
+  return newLabels
+}
+
+const mergeLabels = (owner, repo, ghKey, oldLabels, newLabels, strategy) => {
+  const allLabels = getAllLabels(owner, repo, ghKey)
+  const labels = new Set([...oldLabels])
+  oldLabels.forEach(l => {
+    if (strategy[l]['completely-update']) {
+      labels.remove(l)
+    }
+    if (strategy[l]['remove-if-not-applicable']) {
+      if (!newLabels.has(l)) {
+        labels.delete(l)
+      }
+    }
+  })
+  newLabels.forEach(l => {
+    if (strategy[l]['merge-with-others']) {
+      labels.add(l)
+    }
+    if (strategy[l]['completely-update']) {
+      labels.add(l)
+    }
+    if (strategy[l]['add-if-not-exists']) {
+      if (!allLabels.has(l)) {
+        createLabel(owner, repo, ghKey, l)
+      }
+      labels.add(l)
+    }
+  })
+  return labels
+}
+
+const postNewLabels = (owner, repo, prNumber, ghKey, newLabels) => {
+  const octokit = new Octokit({ auth: ghKey })
+  await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+    owner,
+    repo,
+    issue_number: prNumber,
+    labels: [...newLabels]
+  })
 }
