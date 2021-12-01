@@ -26,6 +26,8 @@ export class FilesModule extends BaseModule {
           break
         }
       })
+    } else if (typeof config === 'string') {
+      return this.areFilesApplicable(fileObjects, label, [config])
     }
 
     if (hasStatus) {
