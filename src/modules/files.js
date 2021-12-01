@@ -66,7 +66,7 @@ export class FilesModule extends BaseModule {
       })
 
       const selectedFilesCount = fileList.length
-      console.log(`---\n${selectedFilesCount} files were selected`)
+      console.log(`---\n${selectedFilesCount} files were applicable`)
       return selectedFilesCount > 0
     }
     return false
