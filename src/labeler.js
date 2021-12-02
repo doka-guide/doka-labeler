@@ -151,7 +151,20 @@ export const setupStrategy = (commonStrategy, config) => {
   labels.forEach(l => {
     const labelConfig = config[l]
     if (labelConfig.hasOwnProperty('strategy')) {
-      resultedStrategy[l] = labelConfig['strategy'] || commonStrategy
+      const strategies = labelConfig['strategy']
+      if (Array.isArray(strategies)) {
+        const o = {}
+        strategies.forEach(s => {
+          o[s] = true
+        })
+        resultedStrategy[l] = o || commonStrategy
+      } else if (typeof strategies === 'object') {
+        resultedStrategy[l] = strategies || commonStrategy
+      } else if (typeof strategies === 'string') {
+        const o = {}
+        o[strategies] = true
+        resultedStrategy[l] = o || commonStrategy
+      }
     } else {
       resultedStrategy[l] = commonStrategy
     }
