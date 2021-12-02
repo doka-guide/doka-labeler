@@ -1,8 +1,7 @@
 <div align="center">
-  <img src="img/logo.png" width="460" height="160" alt="Dog in glasses" />
+  <img src="img/logo.png" width="230" height="80" alt="Dog in glasses" />
+  <h1>Doka Labeler</h1>
 </div>
-
-# Doka Labeler
 
 Automatically label pull requests based on multiple criteria with minimal configuration:
 * files added, deleted, renamed, or modified
