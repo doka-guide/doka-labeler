@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "description": "An action for automatically labelling pull requests",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "ncc build src/main.js -o dist",
     "test": "ava"
@@ -22,7 +23,7 @@
     "@actions/github": "^5.0.0",
     "@octokit/core": "^3.5.1",
     "front-matter": "^4.0.2",
-    "minimatch": "^3.0.4",
+    "picomatch": "^2.3.0",
     "yaml": "^1.10.2"
   },
   "devDependencies": {

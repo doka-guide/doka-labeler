@@ -1,5 +1,5 @@
 import { BaseModule } from "./base.js"
-import { filter } from "minimatch"
+import createMatcher from 'picomatch';
 
 const FILE_STATUSES = [
   'added',
@@ -51,7 +51,7 @@ export class FilesModule extends BaseModule {
       }
 
       patterns.forEach(p => {
-        fileList.filter(filter(p))
+        fileList.filter(createMatcher(p))
       })
       fileList.forEach(f => {
         console.log(`File ${f} is taken into account`)

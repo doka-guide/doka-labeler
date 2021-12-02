@@ -1,5 +1,5 @@
 import { BaseModule } from './base.js'
-import { filter } from "minimatch"
+import createMatcher from 'picomatch';
 import fm from 'front-matter'
 import fs from 'fs'
 
@@ -41,7 +41,7 @@ export class FrontmatterModule extends BaseModule {
         fileList.push(file.filename)
       }
     }
-    return fileList.filter(filter('*.md'))
+    return fileList.filter(createMatcher('*.md'))
   }
 
   getFrontmatterObject(filename) {
