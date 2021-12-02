@@ -33,11 +33,10 @@ export async function run() {
     const fileObjects = await getFileObjects(owner, repo, pullNumber, token)
     const assignee = getAssignee(pullObject)
 
+    const modules = setupModules(labelRules, { fileObjects, assignee })
     const newLabels = prepareNewLabels(modules)
     const oldLabels = await getOldLabels(owner, repo, pullNumber, token)
     const allLabels = await getAllLabels(owner, repo, token)
-
-    const modules = setupModules(labelRules, { fileObjects, assignee })
 
     const strategy = setupStrategy(commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
     const readyToPostLabels = mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
