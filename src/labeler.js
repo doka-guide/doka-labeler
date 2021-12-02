@@ -12,7 +12,7 @@ import { FrontmatterModule } from './modules/frontmatter.js'
 const DEFAULT_STRATEGY = {
   'append': true,
   'replace': false,
-  'create': false,
+  'create-if-missing': false,
   'only': false
 }
 
@@ -203,7 +203,7 @@ const collectNewLabels = (owner, repo, ghKey, allLabels, newLabels, strategy) =>
       onlyLabel = l
       break
     }
-    if (strategy.local[l]['create'] && !allLabels.has(l)) {
+    if (strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
       await createLabel(owner, repo, ghKey, l)
     }
   })
