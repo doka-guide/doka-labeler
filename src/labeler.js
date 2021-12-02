@@ -10,10 +10,10 @@ import { FilesModule } from './modules/files.js'
 import { FrontmatterModule } from './modules/frontmatter.js'
 
 const DEFAULT_STRATEGY = {
-  'merge-with-others': true,
-  'completely-update': false,
-  'add-if-not-exists': false,
-  'remove-if-not-applicable': false
+  'append': true,
+  'replace': false,
+  'create': false,
+  'only': false
 }
 
 export async function run() {
@@ -156,7 +156,7 @@ export const setupStrategy = (commonStrategy, config) => {
       resultedStrategy[l] = commonStrategy
     }
   })
-  return resultedStrategy
+  return { common: commonStrategy, local: resultedStrategy }
 }
 
 const prepareNewLabels = (modules, config) => {
@@ -181,33 +181,39 @@ const prepareNewLabels = (modules, config) => {
   return newLabels
 }
 
-const mergeLabels = async (owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) => {
-  const labels = new Set([...oldLabels])
-  oldLabels.forEach(l => {
-    if (strategy[l]['completely-update']) {
-      labels.remove(l)
+const collectNewLabels = (owner, repo, ghKey, allLabels, newLabels, strategy) => {
+  const labels = new Set([])
+  let onlyLabel = ''
+  labels.forEach(l => {
+    labels.add(l)
+    if (strategy.local[l]['only']) {
+      onlyLabel = l
+      break
     }
-    if (strategy[l]['remove-if-not-applicable']) {
-      if (!newLabels.has(l)) {
-        labels.delete(l)
-      }
-    }
-  })
-  newLabels.forEach(l => {
-    if (strategy[l]['merge-with-others']) {
-      labels.add(l)
-    }
-    if (strategy[l]['completely-update']) {
-      labels.add(l)
-    }
-    if (strategy[l]['add-if-not-exists']) {
-      if (!allLabels.has(l)) {
-        createLabel(owner, repo, ghKey, l)
-      }
-      labels.add(l)
+    if (strategy.local[l]['create'] && !allLabels.has(l)) {
+      await createLabel(owner, repo, ghKey, l)
     }
   })
+  if (!!onlyLabel) {
+    newLabels.forEach(l => {
+      if (l !== onlyLabel) {
+        labels.remove(l)
+      }
+    })
+  }
   return labels
+}
+
+const mergeLabels = async (owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) => {
+  const labels = collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
+  if (strategy.common.append) {
+    oldLabels.forEach(l => {
+      labels.add(l)
+    })
+    return l
+  } else if (strategy.common.replace) {
+    return labels
+  }
 }
 
 const postNewLabels = async (owner, repo, prNumber, ghKey, newLabels) => {
