@@ -145,13 +145,13 @@ export const setupModules = (config, objects) => {
   return modules
 }
 
-const setupStrategy = (commonStrategy, config) => {
+export const setupStrategy = (commonStrategy, config) => {
   const resultedStrategy = {}
   const labels = Object.keys(config)
   labels.forEach(l => {
     const labelConfig = config[l]
     if (labelConfig.hasOwnProperty('strategy')) {
-      resultedStrategy[l] = Object.assign(commonStrategy, labelConfig['strategy'])
+      resultedStrategy[l] = labelConfig['strategy'] || commonStrategy
     } else {
       resultedStrategy[l] = commonStrategy
     }
