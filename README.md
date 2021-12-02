@@ -1,5 +1,5 @@
 <div align="center">
-  ![Dog in glasses](img/logo.png)
+  <img src="img/logo.png" width="460" height="160" alt="Dog in glasses" />
 </div>
 
 # Doka Labeler
