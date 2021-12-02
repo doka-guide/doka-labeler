@@ -3,14 +3,14 @@ import { BaseModule } from "./base.js"
 
 test('BaseModule contains fields object, config', t => {
   const objects = {
+  }
+  const config = {
     label1: {
       files: 'files'
     },
     label2: {
       meta: 'meta config'
-    }
-  }
-  const config = {}
+    }}
 
   const module = new BaseModule(objects, config)
 
