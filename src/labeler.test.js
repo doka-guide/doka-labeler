@@ -4,7 +4,7 @@ import { AssigneeModule } from './modules/assignee.js';
 import { FilesModule } from './modules/files.js';
 import { FrontmatterModule } from './modules/frontmatter.js';
 
-test('setupModules connects necessary modules based on config', (t) => {
+test('setupModules connects necessary modules based on config', t => {
   const config = {
     label1: {
       files: 'files',
@@ -23,7 +23,7 @@ test('setupModules connects necessary modules based on config', (t) => {
   t.truthy(modules.find(module => module instanceof FrontmatterModule))
 })
 
-test('setupModules returns empty list of modules when the config is empty', (t) => {
+test('setupModules returns empty list of modules when the config is empty', t => {
   const config = {}
 
   const modules = setupModules(config, {})
@@ -31,7 +31,7 @@ test('setupModules returns empty list of modules when the config is empty', (t) 
   t.is(modules.length, 0)
 })
 
-test('setupStrategy assigns common strategy to all the labels from the config', (t) => {
+test('setupStrategy assigns common strategy to all the labels from the config', t => {
   const globalStrategy = 'add-if-not-exists'
   const config = {
     label1: {
@@ -50,7 +50,7 @@ test('setupStrategy assigns common strategy to all the labels from the config', 
   })
 })
 
-test('setupStrategy gives precedence to strategy defined on the label level over global', (t) => {
+test('setupStrategy gives precedence to strategy defined on the label level over global', t => {
   const globalStrategy = 'add-if-not-exists'
   const labelStrategy = 'remove-if-not-applicable'
   const config = {
