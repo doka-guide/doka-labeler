@@ -32,7 +32,8 @@ files with `.spec.js`:
 
 ```yml
 tests:
-  files: src/**/*.spec.js
+  files:
+    - src/**/*.spec.js
 ```
 
 You can fine-tune the filepath condition by checking the type of the change for a file:
@@ -86,6 +87,8 @@ article:
 ```
 
 ## Common Examples
+
+If you want to set a label for several conditions in the same time use a following example configuration (all conditions are used by _and_ logic operator):
 
 ```yml
 editor-review:
