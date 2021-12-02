@@ -151,9 +151,7 @@ export const setupStrategy = (commonStrategy, config) => {
   labels.forEach(l => {
     const labelConfig = config[l]
     if (labelConfig.hasOwnProperty('strategy')) {
-      resultedStrategy[l] = labelConfig['strategy'] || commonStrategy
-    } else {
-      resultedStrategy[l] = commonStrategy
+      resultedStrategy[l] = labelConfig['strategy']
     }
   })
   return { common: commonStrategy, local: resultedStrategy }
