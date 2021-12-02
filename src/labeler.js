@@ -82,7 +82,7 @@ const getOldLabels = async (owner, repo, prNumber, ghKey) => {
     issue_number: prNumber,
   })
   for (const key in oldLabelsObject) {
-    if (oldLabelsObject[key].hasOwnProperty('name') && !labels.has(oldLabelsObject[key].name)) {
+    if (oldLabelsObject[key].hasOwnProperty('name')) {
       labels.add(oldLabelsObject[key].name)
     }
   }
