@@ -181,8 +181,7 @@ const prepareNewLabels = (modules, config) => {
   return newLabels
 }
 
-const mergeLabels = async (owner, repo, ghKey, oldLabels, newLabels, strategy) => {
-  const allLabels = getAllLabels(owner, repo, ghKey)
+const mergeLabels = async (owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) => {
   const labels = new Set([...oldLabels])
   oldLabels.forEach(l => {
     if (strategy[l]['completely-update']) {
