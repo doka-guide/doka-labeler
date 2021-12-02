@@ -98,7 +98,7 @@ const getAllLabels = async (owner, repo, ghKey) => {
   })
   const labels = new Set([])
   labelObjects.forEach(lo => {
-    labels.add(fo.name)
+    labels.add(lo.name)
   })
   return labels
 }
@@ -116,16 +116,19 @@ const getAssignee = (pullObject) => {
   return pullObject.assignee
 }
 
-const setupModules = (config, objects) => {
+export const setupModules = (config, objects) => {
   const modules = []
   const moduleNames = new Set([])
   for (const label in config) {
     if (Object.hasOwnProperty.call(config, label)) {
       const setupObject = config[label]
-      moduleNames.add(Object.keys(setupObject))
+      for (const key in setupObject) {
+        if (Object.hasOwnProperty.call(setupObject, key)) {
+          moduleNames.add(key)
+        }
+      }
     }
   }
-
   [...moduleNames].forEach(m => {
     switch (m) {
       case 'assignee':
