@@ -20,7 +20,7 @@ export async function run() {
   try {
     const configPath = core.getInput('config', { required: true })
     const token = core.getInput('token', { required: true })
-    const commonStrategy = !!core.getInput('strategy', { required: false })
+    const commonStrategy = core.getInput('strategy', { required: false })
 
     const file = fs.readFileSync(configPath, 'utf8')
     const labelRules = yaml.parse(file)
@@ -38,7 +38,7 @@ export async function run() {
     const oldLabels = await getOldLabels(owner, repo, pullNumber, token)
     const allLabels = await getAllLabels(owner, repo, token)
 
-    const strategy = setupStrategy(commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
+    const strategy = setupStrategy(!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
     const readyToPostLabels = mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
 
     await postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
