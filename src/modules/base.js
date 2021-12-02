@@ -7,8 +7,6 @@ export class BaseModule {
   }
 
   isApplicable(label, caseNumber = null) {
-    console.log(label)
-    if (caseNumber) console.log(caseNumber)
-    return true
+    return this.config.hasOwnProperty(label)
   }
 }
