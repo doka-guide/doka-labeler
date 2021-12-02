@@ -1,3 +1,7 @@
+<div align="center">
+  ![Dog in glasses](img/logo.png)
+</div>
+
 # Doka Labeler
 
 Automatically label pull requests based on multiple criteria with minimal configuration:
