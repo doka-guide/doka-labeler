@@ -21,15 +21,16 @@ export class AssigneeModule extends BaseModule {
 
     const assignees = this.getArrayFromGitHubAssignees(this.objects)
     if (Array.isArray(config)) {
-      config.forEach(a => {
+      for (let i = 0; i < config.length; i++) {
+        const a = config[i]
         if (assignees.includes(a)) {
-          console.log(`Module — ${this.MODULE_KEY}, label - ${label}: has applicable assignee`)
+          console.log(`Module — ${this.MODULE_KEY}, label - ${label}: array has applicable assignee`)
           return true
         }
-      })
+      }
     } else if (typeof config === 'string') {
       if (assignees.includes(config)) {
-        console.log(`Module — ${this.MODULE_KEY}, label - ${label}: has applicable assignee`)
+        console.log(`Module — ${this.MODULE_KEY}, label - ${label}: string has applicable assignee`)
         return true
       }
     } else {
