@@ -8,15 +8,20 @@ export class AssigneeModule extends BaseModule {
       return undefined
     }
 
-    if (!this.config[label].hasOwnProperty('assignee')) {
-      return undefined
-    }
-
     let config
     if (caseNumber === null) {
-      config = this.config[label].assignee
+      if (this.config[label].hasOwnProperty('assignee')) {
+        config = this.config[label].assignee
+      } else {
+        return undefined
+      }
     } else {
-      config = this.config[label][caseNumber].assignee
+      if (this.config[label].hasOwnProperty(caseNumber)
+        && this.config[label][caseNumber].hasOwnProperty('assignee')) {
+        config = this.config[label][caseNumber].assignee
+      } else {
+        return undefined
+      }
     }
 
     const assignees = this.getArrayFromGitHubAssignees(this.objects)
