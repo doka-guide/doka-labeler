@@ -75,7 +75,7 @@ test('AssignModule parse assignee correctly', t => {
   t.deepEqual(['user1', 'user2'], module.getArrayFromGitHubAssignees(objects))
 })
 
-test('AssigneeModule method isApplicable returns correct values', t => {
+test('AssigneeModule method isApplicable returns correct values for string', t => {
   const objects = [
     {
       "login": "user1",
@@ -118,7 +118,7 @@ test('AssigneeModule method isApplicable returns correct values', t => {
       "site_admin": true
     }
   ]
-  const config = {
+  const config1 = {
     label1: {
       assignee: 'user1'
     },
@@ -127,9 +127,79 @@ test('AssigneeModule method isApplicable returns correct values', t => {
     }
   }
 
-  const module = new AssigneeModule(objects, config)
+  const module1 = new AssigneeModule(objects, config1)
 
-  t.is(module.isApplicable('label1'), true)
-  t.is(module.isApplicable('label2'), false)
-  t.is(module.isApplicable('label3'), undefined)
+  t.is(module1.isApplicable('label1'), true)
+  t.is(module1.isApplicable('label2'), false)
+  t.is(module1.isApplicable('label3'), undefined)
+})
+
+test('AssigneeModule method isApplicable returns correct values for array', t => {
+  const objects = [
+    {
+      "login": "user1",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    {
+      "login": "user2",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/hubot_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hubot",
+      "html_url": "https://github.com/hubot",
+      "followers_url": "https://api.github.com/users/hubot/followers",
+      "following_url": "https://api.github.com/users/hubot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hubot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hubot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hubot/subscriptions",
+      "organizations_url": "https://api.github.com/users/hubot/orgs",
+      "repos_url": "https://api.github.com/users/hubot/repos",
+      "events_url": "https://api.github.com/users/hubot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hubot/received_events",
+      "type": "User",
+      "site_admin": true
+    }
+  ]
+  const config2 = {
+    label1: {
+      assignee: [
+        'user1',
+        'user3'
+      ]
+    },
+    label2: {
+      assignee: [
+        'user2',
+        'user3'
+      ]
+    },
+    label3: {
+      assignee: [
+        'user3'
+      ]
+    }
+  }
+
+  const module2 = new AssigneeModule(objects, config2)
+
+  t.is(module2.isApplicable('label1'), true)
+  t.is(module2.isApplicable('label2'), true)
+  t.is(module2.isApplicable('label3'), false)
 })
