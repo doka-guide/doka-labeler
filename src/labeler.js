@@ -196,7 +196,7 @@ export class Labeler {
               result = result || m.isApplicable(l, i)
             })
           } else if (typeof labelConfigArray === 'object') {
-            result = result && m.isApplicable(l)
+            result = result || m.isApplicable(l)
           }
         }
       })
