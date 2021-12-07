@@ -1,3 +1,4 @@
-import { run } from "./labeler"
+import { Labeler } from "./labeler"
 
-run()
+const l = new Labeler()
+l.run()
