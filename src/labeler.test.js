@@ -1,8 +1,8 @@
 import test from 'ava'
-import { setupModules, setupStrategy } from './labeler.js'
-import { AssigneeModule } from './modules/assignee.js';
-import { FilesModule } from './modules/files.js';
-import { FrontmatterModule } from './modules/frontmatter.js';
+import { Labeler } from './labeler.js'
+import { AssigneeModule } from './modules/assignee.js'
+import { FilesModule } from './modules/files.js'
+import { FrontmatterModule } from './modules/frontmatter.js'
 
 test('setupModules connects necessary modules based on config', t => {
   const config = {
@@ -15,7 +15,8 @@ test('setupModules connects necessary modules based on config', t => {
     }
   }
 
-  const modules = setupModules(config, {})
+  const labeler = new Labeler()
+  const modules = labeler.setupModules(config, {})
 
   t.is(modules.length, 3)
   t.truthy(modules.find(module => module instanceof AssigneeModule))
@@ -26,13 +27,16 @@ test('setupModules connects necessary modules based on config', t => {
 test('setupModules returns empty list of modules when the config is empty', t => {
   const config = {}
 
-  const modules = setupModules(config, {})
+  const labeler = new Labeler()
+  const modules = labeler.setupModules(config, {})
 
   t.is(modules.length, 0)
 })
 
 test('setupStrategy assigns common strategy to all the labels from the config', t => {
-  const globalStrategy = 'add-if-not-exists'
+  const globalStrategy = [
+    'replace'
+  ]
   const config = {
     label1: {
       files: '*'
@@ -42,17 +46,25 @@ test('setupStrategy assigns common strategy to all the labels from the config', 
     }
   }
 
-  const strategyByLabel = setupStrategy(globalStrategy, config)
+  const labeler = new Labeler()
+  const strategyByLabel = labeler.setupStrategy(globalStrategy, config)
 
-  t.like(strategyByLabel, {
-    label1: globalStrategy,
-    label2: globalStrategy,
+  t.like(strategyByLabel.local, {
+    label1: {
+      replace: true,
+    },
+    label2: {
+      replace: true,
+    }
+  })
+  t.like(strategyByLabel.common, {
+    replace: true,
   })
 })
 
 test('setupStrategy gives precedence to strategy defined on the label level over global', t => {
-  const globalStrategy = 'add-if-not-exists'
-  const labelStrategy = 'remove-if-not-applicable'
+  const globalStrategy = 'append'
+  const labelStrategy = 'only'
   const config = {
     label1: {
       files: '*'
@@ -63,10 +75,16 @@ test('setupStrategy gives precedence to strategy defined on the label level over
     }
   }
 
-  const strategyByLabel = setupStrategy(globalStrategy, config)
+  const labeler = new Labeler()
+  const strategyByLabel = labeler.setupStrategy(globalStrategy, config)
 
-  t.like(strategyByLabel, {
-    label1: globalStrategy,
-    label2: labelStrategy
+  t.like(strategyByLabel.local, {
+    label1: {
+      append: true
+    },
+    label2: {
+      append: true,
+      only: true
+    }
   })
 })
