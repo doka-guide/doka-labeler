@@ -1,4 +1,4 @@
-import { Labeler } from "./labeler"
+import { Labeler } from "./labeler.js"
 
 const l = new Labeler()
 l.run()
