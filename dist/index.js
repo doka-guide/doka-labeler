@@ -1,6 +1,604 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7351:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issue = exports.issueCommand = void 0;
+const os = __importStar(__nccwpck_require__(2037));
+const utils_1 = __nccwpck_require__(5278);
+/**
+ * Commands
+ *
+ * Command Format:
+ *   ::name key=value,key=value::message
+ *
+ * Examples:
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
+ */
+function issueCommand(command, properties, message) {
+    const cmd = new Command(command, properties, message);
+    process.stdout.write(cmd.toString() + os.EOL);
+}
+exports.issueCommand = issueCommand;
+function issue(name, message = '') {
+    issueCommand(name, {}, message);
+}
+exports.issue = issue;
+const CMD_STRING = '::';
+class Command {
+    constructor(command, properties, message) {
+        if (!command) {
+            command = 'missing.command';
+        }
+        this.command = command;
+        this.properties = properties;
+        this.message = message;
+    }
+    toString() {
+        let cmdStr = CMD_STRING + this.command;
+        if (this.properties && Object.keys(this.properties).length > 0) {
+            cmdStr += ' ';
+            let first = true;
+            for (const key in this.properties) {
+                if (this.properties.hasOwnProperty(key)) {
+                    const val = this.properties[key];
+                    if (val) {
+                        if (first) {
+                            first = false;
+                        }
+                        else {
+                            cmdStr += ',';
+                        }
+                        cmdStr += `${key}=${escapeProperty(val)}`;
+                    }
+                }
+            }
+        }
+        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
+        return cmdStr;
+    }
+}
+function escapeData(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A');
+}
+function escapeProperty(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A')
+        .replace(/:/g, '%3A')
+        .replace(/,/g, '%2C');
+}
+//# sourceMappingURL=command.js.map
+
+/***/ }),
+
+/***/ 2186:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+const command_1 = __nccwpck_require__(7351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(5278);
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
+const oidc_utils_1 = __nccwpck_require__(8041);
+/**
+ * The code to exit an action
+ */
+var ExitCode;
+(function (ExitCode) {
+    /**
+     * A code indicating that the action was successful
+     */
+    ExitCode[ExitCode["Success"] = 0] = "Success";
+    /**
+     * A code indicating that the action was a failure
+     */
+    ExitCode[ExitCode["Failure"] = 1] = "Failure";
+})(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
+//-----------------------------------------------------------------------
+// Variables
+//-----------------------------------------------------------------------
+/**
+ * Sets env variable for this action and future actions in the job
+ * @param name the name of the variable to set
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function exportVariable(name, val) {
+    const convertedVal = utils_1.toCommandValue(val);
+    process.env[name] = convertedVal;
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
+}
+exports.exportVariable = exportVariable;
+/**
+ * Registers a secret which will get masked from logs
+ * @param secret value of the secret
+ */
+function setSecret(secret) {
+    command_1.issueCommand('add-mask', {}, secret);
+}
+exports.setSecret = setSecret;
+/**
+ * Prepends inputPath to the PATH (for this action and future actions)
+ * @param inputPath
+ */
+function addPath(inputPath) {
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
+    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
+}
+exports.addPath = addPath;
+/**
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string
+ */
+function getInput(name, options) {
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    if (options && options.required && !val) {
+        throw new Error(`Input required and not supplied: ${name}`);
+    }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
+    return val.trim();
+}
+exports.getInput = getInput;
+/**
+ * Gets the values of an multiline input.  Each value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string[]
+ *
+ */
+function getMultilineInput(name, options) {
+    const inputs = getInput(name, options)
+        .split('\n')
+        .filter(x => x !== '');
+    return inputs;
+}
+exports.getMultilineInput = getMultilineInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
+/**
+ * Sets the value of an output.
+ *
+ * @param     name     name of the output to set
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function setOutput(name, value) {
+    process.stdout.write(os.EOL);
+    command_1.issueCommand('set-output', { name }, value);
+}
+exports.setOutput = setOutput;
+/**
+ * Enables or disables the echoing of commands into stdout for the rest of the step.
+ * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
+ *
+ */
+function setCommandEcho(enabled) {
+    command_1.issue('echo', enabled ? 'on' : 'off');
+}
+exports.setCommandEcho = setCommandEcho;
+//-----------------------------------------------------------------------
+// Results
+//-----------------------------------------------------------------------
+/**
+ * Sets the action status to failed.
+ * When the action exits it will be with an exit code of 1
+ * @param message add error issue message
+ */
+function setFailed(message) {
+    process.exitCode = ExitCode.Failure;
+    error(message);
+}
+exports.setFailed = setFailed;
+//-----------------------------------------------------------------------
+// Logging Commands
+//-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */
+function isDebug() {
+    return process.env['RUNNER_DEBUG'] === '1';
+}
+exports.isDebug = isDebug;
+/**
+ * Writes debug message to user log
+ * @param message debug message
+ */
+function debug(message) {
+    command_1.issueCommand('debug', {}, message);
+}
+exports.debug = debug;
+/**
+ * Adds an error issue
+ * @param message error issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */
+function error(message, properties = {}) {
+    command_1.issueCommand('error', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+exports.error = error;
+/**
+ * Adds a warning issue
+ * @param message warning issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */
+function warning(message, properties = {}) {
+    command_1.issueCommand('warning', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+exports.warning = warning;
+/**
+ * Adds a notice issue
+ * @param message notice issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */
+function notice(message, properties = {}) {
+    command_1.issueCommand('notice', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+exports.notice = notice;
+/**
+ * Writes info to log with console.log.
+ * @param message info message
+ */
+function info(message) {
+    process.stdout.write(message + os.EOL);
+}
+exports.info = info;
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */
+function startGroup(name) {
+    command_1.issue('group', name);
+}
+exports.startGroup = startGroup;
+/**
+ * End an output group.
+ */
+function endGroup() {
+    command_1.issue('endgroup');
+}
+exports.endGroup = endGroup;
+/**
+ * Wrap an asynchronous function call in a group.
+ *
+ * Returns the same type as the function itself.
+ *
+ * @param name The name of the group
+ * @param fn The function to wrap in the group
+ */
+function group(name, fn) {
+    return __awaiter(this, void 0, void 0, function* () {
+        startGroup(name);
+        let result;
+        try {
+            result = yield fn();
+        }
+        finally {
+            endGroup();
+        }
+        return result;
+    });
+}
+exports.group = group;
+//-----------------------------------------------------------------------
+// Wrapper action state
+//-----------------------------------------------------------------------
+/**
+ * Saves state for current action, the state can only be retrieved by this action's post job execution.
+ *
+ * @param     name     name of the state to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function saveState(name, value) {
+    command_1.issueCommand('save-state', { name }, value);
+}
+exports.saveState = saveState;
+/**
+ * Gets the value of an state set by this action's main execution.
+ *
+ * @param     name     name of the state to get
+ * @returns   string
+ */
+function getState(name) {
+    return process.env[`STATE_${name}`] || '';
+}
+exports.getState = getState;
+function getIDToken(aud) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield oidc_utils_1.OidcClient.getIDToken(aud);
+    });
+}
+exports.getIDToken = getIDToken;
+//# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 717:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+// For internal use, subject to change.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueCommand = void 0;
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
+const utils_1 = __nccwpck_require__(5278);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
+
+/***/ }),
+
+/***/ 8041:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OidcClient = void 0;
+const http_client_1 = __nccwpck_require__(9925);
+const auth_1 = __nccwpck_require__(3702);
+const core_1 = __nccwpck_require__(2186);
+class OidcClient {
+    static createHttpClient(allowRetry = true, maxRetry = 10) {
+        const requestOptions = {
+            allowRetries: allowRetry,
+            maxRetries: maxRetry
+        };
+        return new http_client_1.HttpClient('actions/oidc-client', [new auth_1.BearerCredentialHandler(OidcClient.getRequestToken())], requestOptions);
+    }
+    static getRequestToken() {
+        const token = process.env['ACTIONS_ID_TOKEN_REQUEST_TOKEN'];
+        if (!token) {
+            throw new Error('Unable to get ACTIONS_ID_TOKEN_REQUEST_TOKEN env variable');
+        }
+        return token;
+    }
+    static getIDTokenUrl() {
+        const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL'];
+        if (!runtimeUrl) {
+            throw new Error('Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable');
+        }
+        return runtimeUrl;
+    }
+    static getCall(id_token_url) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const httpclient = OidcClient.createHttpClient();
+            const res = yield httpclient
+                .getJson(id_token_url)
+                .catch(error => {
+                throw new Error(`Failed to get ID Token. \n 
+        Error Code : ${error.statusCode}\n 
+        Error Message: ${error.result.message}`);
+            });
+            const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
+            if (!id_token) {
+                throw new Error('Response json body do not have ID Token field');
+            }
+            return id_token;
+        });
+    }
+    static getIDToken(audience) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // New ID Token is requested from action service
+                let id_token_url = OidcClient.getIDTokenUrl();
+                if (audience) {
+                    const encodedAudience = encodeURIComponent(audience);
+                    id_token_url = `${id_token_url}&audience=${encodedAudience}`;
+                }
+                core_1.debug(`ID token url is ${id_token_url}`);
+                const id_token = yield OidcClient.getCall(id_token_url);
+                core_1.setSecret(id_token);
+                return id_token;
+            }
+            catch (error) {
+                throw new Error(`Error message: ${error.message}`);
+            }
+        });
+    }
+}
+exports.OidcClient = OidcClient;
+//# sourceMappingURL=oidc-utils.js.map
+
+/***/ }),
+
+/***/ 5278:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toCommandProperties = exports.toCommandValue = void 0;
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+/**
+ *
+ * @param annotationProperties
+ * @returns The command properties to send with the actual annotation command
+ * See IssueCommandProperties: https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs#L646
+ */
+function toCommandProperties(annotationProperties) {
+    if (!Object.keys(annotationProperties).length) {
+        return {};
+    }
+    return {
+        title: annotationProperties.title,
+        file: annotationProperties.file,
+        line: annotationProperties.startLine,
+        endLine: annotationProperties.endLine,
+        col: annotationProperties.startColumn,
+        endColumn: annotationProperties.endColumn
+    };
+}
+exports.toCommandProperties = toCommandProperties;
+//# sourceMappingURL=utils.js.map
+
+/***/ }),
+
 /***/ 4087:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -213,6 +811,72 @@ function getOctokitOptions(token, options) {
 }
 exports.getOctokitOptions = getOctokitOptions;
 //# sourceMappingURL=utils.js.map
+
+/***/ }),
+
+/***/ 3702:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+class BasicCredentialHandler {
+    constructor(username, password) {
+        this.username = username;
+        this.password = password;
+    }
+    prepareRequest(options) {
+        options.headers['Authorization'] =
+            'Basic ' +
+                Buffer.from(this.username + ':' + this.password).toString('base64');
+    }
+    // This handler cannot handle 401
+    canHandleAuthentication(response) {
+        return false;
+    }
+    handleAuthentication(httpClient, requestInfo, objs) {
+        return null;
+    }
+}
+exports.BasicCredentialHandler = BasicCredentialHandler;
+class BearerCredentialHandler {
+    constructor(token) {
+        this.token = token;
+    }
+    // currently implements pre-authorization
+    // TODO: support preAuth = false where it hooks on 401
+    prepareRequest(options) {
+        options.headers['Authorization'] = 'Bearer ' + this.token;
+    }
+    // This handler cannot handle 401
+    canHandleAuthentication(response) {
+        return false;
+    }
+    handleAuthentication(httpClient, requestInfo, objs) {
+        return null;
+    }
+}
+exports.BearerCredentialHandler = BearerCredentialHandler;
+class PersonalAccessTokenCredentialHandler {
+    constructor(token) {
+        this.token = token;
+    }
+    // currently implements pre-authorization
+    // TODO: support preAuth = false where it hooks on 401
+    prepareRequest(options) {
+        options.headers['Authorization'] =
+            'Basic ' + Buffer.from('PAT:' + this.token).toString('base64');
+    }
+    // This handler cannot handle 401
+    canHandleAuthentication(response) {
+        return false;
+    }
+    handleAuthentication(httpClient, requestInfo, objs) {
+        return null;
+    }
+}
+exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHandler;
+
 
 /***/ }),
 
@@ -9355,6 +10019,2117 @@ function onceStrict (fn) {
 
 /***/ }),
 
+/***/ 8569:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+module.exports = __nccwpck_require__(3322);
+
+
+/***/ }),
+
+/***/ 6099:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const path = __nccwpck_require__(1017);
+const WIN_SLASH = '\\\\/';
+const WIN_NO_SLASH = `[^${WIN_SLASH}]`;
+
+/**
+ * Posix glob regex
+ */
+
+const DOT_LITERAL = '\\.';
+const PLUS_LITERAL = '\\+';
+const QMARK_LITERAL = '\\?';
+const SLASH_LITERAL = '\\/';
+const ONE_CHAR = '(?=.)';
+const QMARK = '[^/]';
+const END_ANCHOR = `(?:${SLASH_LITERAL}|$)`;
+const START_ANCHOR = `(?:^|${SLASH_LITERAL})`;
+const DOTS_SLASH = `${DOT_LITERAL}{1,2}${END_ANCHOR}`;
+const NO_DOT = `(?!${DOT_LITERAL})`;
+const NO_DOTS = `(?!${START_ANCHOR}${DOTS_SLASH})`;
+const NO_DOT_SLASH = `(?!${DOT_LITERAL}{0,1}${END_ANCHOR})`;
+const NO_DOTS_SLASH = `(?!${DOTS_SLASH})`;
+const QMARK_NO_DOT = `[^.${SLASH_LITERAL}]`;
+const STAR = `${QMARK}*?`;
+
+const POSIX_CHARS = {
+  DOT_LITERAL,
+  PLUS_LITERAL,
+  QMARK_LITERAL,
+  SLASH_LITERAL,
+  ONE_CHAR,
+  QMARK,
+  END_ANCHOR,
+  DOTS_SLASH,
+  NO_DOT,
+  NO_DOTS,
+  NO_DOT_SLASH,
+  NO_DOTS_SLASH,
+  QMARK_NO_DOT,
+  STAR,
+  START_ANCHOR
+};
+
+/**
+ * Windows glob regex
+ */
+
+const WINDOWS_CHARS = {
+  ...POSIX_CHARS,
+
+  SLASH_LITERAL: `[${WIN_SLASH}]`,
+  QMARK: WIN_NO_SLASH,
+  STAR: `${WIN_NO_SLASH}*?`,
+  DOTS_SLASH: `${DOT_LITERAL}{1,2}(?:[${WIN_SLASH}]|$)`,
+  NO_DOT: `(?!${DOT_LITERAL})`,
+  NO_DOTS: `(?!(?:^|[${WIN_SLASH}])${DOT_LITERAL}{1,2}(?:[${WIN_SLASH}]|$))`,
+  NO_DOT_SLASH: `(?!${DOT_LITERAL}{0,1}(?:[${WIN_SLASH}]|$))`,
+  NO_DOTS_SLASH: `(?!${DOT_LITERAL}{1,2}(?:[${WIN_SLASH}]|$))`,
+  QMARK_NO_DOT: `[^.${WIN_SLASH}]`,
+  START_ANCHOR: `(?:^|[${WIN_SLASH}])`,
+  END_ANCHOR: `(?:[${WIN_SLASH}]|$)`
+};
+
+/**
+ * POSIX Bracket Regex
+ */
+
+const POSIX_REGEX_SOURCE = {
+  alnum: 'a-zA-Z0-9',
+  alpha: 'a-zA-Z',
+  ascii: '\\x00-\\x7F',
+  blank: ' \\t',
+  cntrl: '\\x00-\\x1F\\x7F',
+  digit: '0-9',
+  graph: '\\x21-\\x7E',
+  lower: 'a-z',
+  print: '\\x20-\\x7E ',
+  punct: '\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~',
+  space: ' \\t\\r\\n\\v\\f',
+  upper: 'A-Z',
+  word: 'A-Za-z0-9_',
+  xdigit: 'A-Fa-f0-9'
+};
+
+module.exports = {
+  MAX_LENGTH: 1024 * 64,
+  POSIX_REGEX_SOURCE,
+
+  // regular expressions
+  REGEX_BACKSLASH: /\\(?![*+?^${}(|)[\]])/g,
+  REGEX_NON_SPECIAL_CHARS: /^[^@![\].,$*+?^{}()|\\/]+/,
+  REGEX_SPECIAL_CHARS: /[-*+?.^${}(|)[\]]/,
+  REGEX_SPECIAL_CHARS_BACKREF: /(\\?)((\W)(\3*))/g,
+  REGEX_SPECIAL_CHARS_GLOBAL: /([-*+?.^${}(|)[\]])/g,
+  REGEX_REMOVE_BACKSLASH: /(?:\[.*?[^\\]\]|\\(?=.))/g,
+
+  // Replace globs with equivalent patterns to reduce parsing time.
+  REPLACEMENTS: {
+    '***': '*',
+    '**/**': '**',
+    '**/**/**': '**'
+  },
+
+  // Digits
+  CHAR_0: 48, /* 0 */
+  CHAR_9: 57, /* 9 */
+
+  // Alphabet chars.
+  CHAR_UPPERCASE_A: 65, /* A */
+  CHAR_LOWERCASE_A: 97, /* a */
+  CHAR_UPPERCASE_Z: 90, /* Z */
+  CHAR_LOWERCASE_Z: 122, /* z */
+
+  CHAR_LEFT_PARENTHESES: 40, /* ( */
+  CHAR_RIGHT_PARENTHESES: 41, /* ) */
+
+  CHAR_ASTERISK: 42, /* * */
+
+  // Non-alphabetic chars.
+  CHAR_AMPERSAND: 38, /* & */
+  CHAR_AT: 64, /* @ */
+  CHAR_BACKWARD_SLASH: 92, /* \ */
+  CHAR_CARRIAGE_RETURN: 13, /* \r */
+  CHAR_CIRCUMFLEX_ACCENT: 94, /* ^ */
+  CHAR_COLON: 58, /* : */
+  CHAR_COMMA: 44, /* , */
+  CHAR_DOT: 46, /* . */
+  CHAR_DOUBLE_QUOTE: 34, /* " */
+  CHAR_EQUAL: 61, /* = */
+  CHAR_EXCLAMATION_MARK: 33, /* ! */
+  CHAR_FORM_FEED: 12, /* \f */
+  CHAR_FORWARD_SLASH: 47, /* / */
+  CHAR_GRAVE_ACCENT: 96, /* ` */
+  CHAR_HASH: 35, /* # */
+  CHAR_HYPHEN_MINUS: 45, /* - */
+  CHAR_LEFT_ANGLE_BRACKET: 60, /* < */
+  CHAR_LEFT_CURLY_BRACE: 123, /* { */
+  CHAR_LEFT_SQUARE_BRACKET: 91, /* [ */
+  CHAR_LINE_FEED: 10, /* \n */
+  CHAR_NO_BREAK_SPACE: 160, /* \u00A0 */
+  CHAR_PERCENT: 37, /* % */
+  CHAR_PLUS: 43, /* + */
+  CHAR_QUESTION_MARK: 63, /* ? */
+  CHAR_RIGHT_ANGLE_BRACKET: 62, /* > */
+  CHAR_RIGHT_CURLY_BRACE: 125, /* } */
+  CHAR_RIGHT_SQUARE_BRACKET: 93, /* ] */
+  CHAR_SEMICOLON: 59, /* ; */
+  CHAR_SINGLE_QUOTE: 39, /* ' */
+  CHAR_SPACE: 32, /*   */
+  CHAR_TAB: 9, /* \t */
+  CHAR_UNDERSCORE: 95, /* _ */
+  CHAR_VERTICAL_LINE: 124, /* | */
+  CHAR_ZERO_WIDTH_NOBREAK_SPACE: 65279, /* \uFEFF */
+
+  SEP: path.sep,
+
+  /**
+   * Create EXTGLOB_CHARS
+   */
+
+  extglobChars(chars) {
+    return {
+      '!': { type: 'negate', open: '(?:(?!(?:', close: `))${chars.STAR})` },
+      '?': { type: 'qmark', open: '(?:', close: ')?' },
+      '+': { type: 'plus', open: '(?:', close: ')+' },
+      '*': { type: 'star', open: '(?:', close: ')*' },
+      '@': { type: 'at', open: '(?:', close: ')' }
+    };
+  },
+
+  /**
+   * Create GLOB_CHARS
+   */
+
+  globChars(win32) {
+    return win32 === true ? WINDOWS_CHARS : POSIX_CHARS;
+  }
+};
+
+
+/***/ }),
+
+/***/ 2139:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const constants = __nccwpck_require__(6099);
+const utils = __nccwpck_require__(479);
+
+/**
+ * Constants
+ */
+
+const {
+  MAX_LENGTH,
+  POSIX_REGEX_SOURCE,
+  REGEX_NON_SPECIAL_CHARS,
+  REGEX_SPECIAL_CHARS_BACKREF,
+  REPLACEMENTS
+} = constants;
+
+/**
+ * Helpers
+ */
+
+const expandRange = (args, options) => {
+  if (typeof options.expandRange === 'function') {
+    return options.expandRange(...args, options);
+  }
+
+  args.sort();
+  const value = `[${args.join('-')}]`;
+
+  try {
+    /* eslint-disable-next-line no-new */
+    new RegExp(value);
+  } catch (ex) {
+    return args.map(v => utils.escapeRegex(v)).join('..');
+  }
+
+  return value;
+};
+
+/**
+ * Create the message for a syntax error
+ */
+
+const syntaxError = (type, char) => {
+  return `Missing ${type}: "${char}" - use "\\\\${char}" to match literal characters`;
+};
+
+/**
+ * Parse the given input string.
+ * @param {String} input
+ * @param {Object} options
+ * @return {Object}
+ */
+
+const parse = (input, options) => {
+  if (typeof input !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+
+  input = REPLACEMENTS[input] || input;
+
+  const opts = { ...options };
+  const max = typeof opts.maxLength === 'number' ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
+
+  let len = input.length;
+  if (len > max) {
+    throw new SyntaxError(`Input length: ${len}, exceeds maximum allowed length: ${max}`);
+  }
+
+  const bos = { type: 'bos', value: '', output: opts.prepend || '' };
+  const tokens = [bos];
+
+  const capture = opts.capture ? '' : '?:';
+  const win32 = utils.isWindows(options);
+
+  // create constants based on platform, for windows or posix
+  const PLATFORM_CHARS = constants.globChars(win32);
+  const EXTGLOB_CHARS = constants.extglobChars(PLATFORM_CHARS);
+
+  const {
+    DOT_LITERAL,
+    PLUS_LITERAL,
+    SLASH_LITERAL,
+    ONE_CHAR,
+    DOTS_SLASH,
+    NO_DOT,
+    NO_DOT_SLASH,
+    NO_DOTS_SLASH,
+    QMARK,
+    QMARK_NO_DOT,
+    STAR,
+    START_ANCHOR
+  } = PLATFORM_CHARS;
+
+  const globstar = opts => {
+    return `(${capture}(?:(?!${START_ANCHOR}${opts.dot ? DOTS_SLASH : DOT_LITERAL}).)*?)`;
+  };
+
+  const nodot = opts.dot ? '' : NO_DOT;
+  const qmarkNoDot = opts.dot ? QMARK : QMARK_NO_DOT;
+  let star = opts.bash === true ? globstar(opts) : STAR;
+
+  if (opts.capture) {
+    star = `(${star})`;
+  }
+
+  // minimatch options support
+  if (typeof opts.noext === 'boolean') {
+    opts.noextglob = opts.noext;
+  }
+
+  const state = {
+    input,
+    index: -1,
+    start: 0,
+    dot: opts.dot === true,
+    consumed: '',
+    output: '',
+    prefix: '',
+    backtrack: false,
+    negated: false,
+    brackets: 0,
+    braces: 0,
+    parens: 0,
+    quotes: 0,
+    globstar: false,
+    tokens
+  };
+
+  input = utils.removePrefix(input, state);
+  len = input.length;
+
+  const extglobs = [];
+  const braces = [];
+  const stack = [];
+  let prev = bos;
+  let value;
+
+  /**
+   * Tokenizing helpers
+   */
+
+  const eos = () => state.index === len - 1;
+  const peek = state.peek = (n = 1) => input[state.index + n];
+  const advance = state.advance = () => input[++state.index] || '';
+  const remaining = () => input.slice(state.index + 1);
+  const consume = (value = '', num = 0) => {
+    state.consumed += value;
+    state.index += num;
+  };
+
+  const append = token => {
+    state.output += token.output != null ? token.output : token.value;
+    consume(token.value);
+  };
+
+  const negate = () => {
+    let count = 1;
+
+    while (peek() === '!' && (peek(2) !== '(' || peek(3) === '?')) {
+      advance();
+      state.start++;
+      count++;
+    }
+
+    if (count % 2 === 0) {
+      return false;
+    }
+
+    state.negated = true;
+    state.start++;
+    return true;
+  };
+
+  const increment = type => {
+    state[type]++;
+    stack.push(type);
+  };
+
+  const decrement = type => {
+    state[type]--;
+    stack.pop();
+  };
+
+  /**
+   * Push tokens onto the tokens array. This helper speeds up
+   * tokenizing by 1) helping us avoid backtracking as much as possible,
+   * and 2) helping us avoid creating extra tokens when consecutive
+   * characters are plain text. This improves performance and simplifies
+   * lookbehinds.
+   */
+
+  const push = tok => {
+    if (prev.type === 'globstar') {
+      const isBrace = state.braces > 0 && (tok.type === 'comma' || tok.type === 'brace');
+      const isExtglob = tok.extglob === true || (extglobs.length && (tok.type === 'pipe' || tok.type === 'paren'));
+
+      if (tok.type !== 'slash' && tok.type !== 'paren' && !isBrace && !isExtglob) {
+        state.output = state.output.slice(0, -prev.output.length);
+        prev.type = 'star';
+        prev.value = '*';
+        prev.output = star;
+        state.output += prev.output;
+      }
+    }
+
+    if (extglobs.length && tok.type !== 'paren') {
+      extglobs[extglobs.length - 1].inner += tok.value;
+    }
+
+    if (tok.value || tok.output) append(tok);
+    if (prev && prev.type === 'text' && tok.type === 'text') {
+      prev.value += tok.value;
+      prev.output = (prev.output || '') + tok.value;
+      return;
+    }
+
+    tok.prev = prev;
+    tokens.push(tok);
+    prev = tok;
+  };
+
+  const extglobOpen = (type, value) => {
+    const token = { ...EXTGLOB_CHARS[value], conditions: 1, inner: '' };
+
+    token.prev = prev;
+    token.parens = state.parens;
+    token.output = state.output;
+    const output = (opts.capture ? '(' : '') + token.open;
+
+    increment('parens');
+    push({ type, value, output: state.output ? '' : ONE_CHAR });
+    push({ type: 'paren', extglob: true, value: advance(), output });
+    extglobs.push(token);
+  };
+
+  const extglobClose = token => {
+    let output = token.close + (opts.capture ? ')' : '');
+    let rest;
+
+    if (token.type === 'negate') {
+      let extglobStar = star;
+
+      if (token.inner && token.inner.length > 1 && token.inner.includes('/')) {
+        extglobStar = globstar(opts);
+      }
+
+      if (extglobStar !== star || eos() || /^\)+$/.test(remaining())) {
+        output = token.close = `)$))${extglobStar}`;
+      }
+
+      if (token.inner.includes('*') && (rest = remaining()) && /^\.[^\\/.]+$/.test(rest)) {
+        output = token.close = `)${rest})${extglobStar})`;
+      }
+
+      if (token.prev.type === 'bos') {
+        state.negatedExtglob = true;
+      }
+    }
+
+    push({ type: 'paren', extglob: true, value, output });
+    decrement('parens');
+  };
+
+  /**
+   * Fast paths
+   */
+
+  if (opts.fastpaths !== false && !/(^[*!]|[/()[\]{}"])/.test(input)) {
+    let backslashes = false;
+
+    let output = input.replace(REGEX_SPECIAL_CHARS_BACKREF, (m, esc, chars, first, rest, index) => {
+      if (first === '\\') {
+        backslashes = true;
+        return m;
+      }
+
+      if (first === '?') {
+        if (esc) {
+          return esc + first + (rest ? QMARK.repeat(rest.length) : '');
+        }
+        if (index === 0) {
+          return qmarkNoDot + (rest ? QMARK.repeat(rest.length) : '');
+        }
+        return QMARK.repeat(chars.length);
+      }
+
+      if (first === '.') {
+        return DOT_LITERAL.repeat(chars.length);
+      }
+
+      if (first === '*') {
+        if (esc) {
+          return esc + first + (rest ? star : '');
+        }
+        return star;
+      }
+      return esc ? m : `\\${m}`;
+    });
+
+    if (backslashes === true) {
+      if (opts.unescape === true) {
+        output = output.replace(/\\/g, '');
+      } else {
+        output = output.replace(/\\+/g, m => {
+          return m.length % 2 === 0 ? '\\\\' : (m ? '\\' : '');
+        });
+      }
+    }
+
+    if (output === input && opts.contains === true) {
+      state.output = input;
+      return state;
+    }
+
+    state.output = utils.wrapOutput(output, state, options);
+    return state;
+  }
+
+  /**
+   * Tokenize input until we reach end-of-string
+   */
+
+  while (!eos()) {
+    value = advance();
+
+    if (value === '\u0000') {
+      continue;
+    }
+
+    /**
+     * Escaped characters
+     */
+
+    if (value === '\\') {
+      const next = peek();
+
+      if (next === '/' && opts.bash !== true) {
+        continue;
+      }
+
+      if (next === '.' || next === ';') {
+        continue;
+      }
+
+      if (!next) {
+        value += '\\';
+        push({ type: 'text', value });
+        continue;
+      }
+
+      // collapse slashes to reduce potential for exploits
+      const match = /^\\+/.exec(remaining());
+      let slashes = 0;
+
+      if (match && match[0].length > 2) {
+        slashes = match[0].length;
+        state.index += slashes;
+        if (slashes % 2 !== 0) {
+          value += '\\';
+        }
+      }
+
+      if (opts.unescape === true) {
+        value = advance();
+      } else {
+        value += advance();
+      }
+
+      if (state.brackets === 0) {
+        push({ type: 'text', value });
+        continue;
+      }
+    }
+
+    /**
+     * If we're inside a regex character class, continue
+     * until we reach the closing bracket.
+     */
+
+    if (state.brackets > 0 && (value !== ']' || prev.value === '[' || prev.value === '[^')) {
+      if (opts.posix !== false && value === ':') {
+        const inner = prev.value.slice(1);
+        if (inner.includes('[')) {
+          prev.posix = true;
+
+          if (inner.includes(':')) {
+            const idx = prev.value.lastIndexOf('[');
+            const pre = prev.value.slice(0, idx);
+            const rest = prev.value.slice(idx + 2);
+            const posix = POSIX_REGEX_SOURCE[rest];
+            if (posix) {
+              prev.value = pre + posix;
+              state.backtrack = true;
+              advance();
+
+              if (!bos.output && tokens.indexOf(prev) === 1) {
+                bos.output = ONE_CHAR;
+              }
+              continue;
+            }
+          }
+        }
+      }
+
+      if ((value === '[' && peek() !== ':') || (value === '-' && peek() === ']')) {
+        value = `\\${value}`;
+      }
+
+      if (value === ']' && (prev.value === '[' || prev.value === '[^')) {
+        value = `\\${value}`;
+      }
+
+      if (opts.posix === true && value === '!' && prev.value === '[') {
+        value = '^';
+      }
+
+      prev.value += value;
+      append({ value });
+      continue;
+    }
+
+    /**
+     * If we're inside a quoted string, continue
+     * until we reach the closing double quote.
+     */
+
+    if (state.quotes === 1 && value !== '"') {
+      value = utils.escapeRegex(value);
+      prev.value += value;
+      append({ value });
+      continue;
+    }
+
+    /**
+     * Double quotes
+     */
+
+    if (value === '"') {
+      state.quotes = state.quotes === 1 ? 0 : 1;
+      if (opts.keepQuotes === true) {
+        push({ type: 'text', value });
+      }
+      continue;
+    }
+
+    /**
+     * Parentheses
+     */
+
+    if (value === '(') {
+      increment('parens');
+      push({ type: 'paren', value });
+      continue;
+    }
+
+    if (value === ')') {
+      if (state.parens === 0 && opts.strictBrackets === true) {
+        throw new SyntaxError(syntaxError('opening', '('));
+      }
+
+      const extglob = extglobs[extglobs.length - 1];
+      if (extglob && state.parens === extglob.parens + 1) {
+        extglobClose(extglobs.pop());
+        continue;
+      }
+
+      push({ type: 'paren', value, output: state.parens ? ')' : '\\)' });
+      decrement('parens');
+      continue;
+    }
+
+    /**
+     * Square brackets
+     */
+
+    if (value === '[') {
+      if (opts.nobracket === true || !remaining().includes(']')) {
+        if (opts.nobracket !== true && opts.strictBrackets === true) {
+          throw new SyntaxError(syntaxError('closing', ']'));
+        }
+
+        value = `\\${value}`;
+      } else {
+        increment('brackets');
+      }
+
+      push({ type: 'bracket', value });
+      continue;
+    }
+
+    if (value === ']') {
+      if (opts.nobracket === true || (prev && prev.type === 'bracket' && prev.value.length === 1)) {
+        push({ type: 'text', value, output: `\\${value}` });
+        continue;
+      }
+
+      if (state.brackets === 0) {
+        if (opts.strictBrackets === true) {
+          throw new SyntaxError(syntaxError('opening', '['));
+        }
+
+        push({ type: 'text', value, output: `\\${value}` });
+        continue;
+      }
+
+      decrement('brackets');
+
+      const prevValue = prev.value.slice(1);
+      if (prev.posix !== true && prevValue[0] === '^' && !prevValue.includes('/')) {
+        value = `/${value}`;
+      }
+
+      prev.value += value;
+      append({ value });
+
+      // when literal brackets are explicitly disabled
+      // assume we should match with a regex character class
+      if (opts.literalBrackets === false || utils.hasRegexChars(prevValue)) {
+        continue;
+      }
+
+      const escaped = utils.escapeRegex(prev.value);
+      state.output = state.output.slice(0, -prev.value.length);
+
+      // when literal brackets are explicitly enabled
+      // assume we should escape the brackets to match literal characters
+      if (opts.literalBrackets === true) {
+        state.output += escaped;
+        prev.value = escaped;
+        continue;
+      }
+
+      // when the user specifies nothing, try to match both
+      prev.value = `(${capture}${escaped}|${prev.value})`;
+      state.output += prev.value;
+      continue;
+    }
+
+    /**
+     * Braces
+     */
+
+    if (value === '{' && opts.nobrace !== true) {
+      increment('braces');
+
+      const open = {
+        type: 'brace',
+        value,
+        output: '(',
+        outputIndex: state.output.length,
+        tokensIndex: state.tokens.length
+      };
+
+      braces.push(open);
+      push(open);
+      continue;
+    }
+
+    if (value === '}') {
+      const brace = braces[braces.length - 1];
+
+      if (opts.nobrace === true || !brace) {
+        push({ type: 'text', value, output: value });
+        continue;
+      }
+
+      let output = ')';
+
+      if (brace.dots === true) {
+        const arr = tokens.slice();
+        const range = [];
+
+        for (let i = arr.length - 1; i >= 0; i--) {
+          tokens.pop();
+          if (arr[i].type === 'brace') {
+            break;
+          }
+          if (arr[i].type !== 'dots') {
+            range.unshift(arr[i].value);
+          }
+        }
+
+        output = expandRange(range, opts);
+        state.backtrack = true;
+      }
+
+      if (brace.comma !== true && brace.dots !== true) {
+        const out = state.output.slice(0, brace.outputIndex);
+        const toks = state.tokens.slice(brace.tokensIndex);
+        brace.value = brace.output = '\\{';
+        value = output = '\\}';
+        state.output = out;
+        for (const t of toks) {
+          state.output += (t.output || t.value);
+        }
+      }
+
+      push({ type: 'brace', value, output });
+      decrement('braces');
+      braces.pop();
+      continue;
+    }
+
+    /**
+     * Pipes
+     */
+
+    if (value === '|') {
+      if (extglobs.length > 0) {
+        extglobs[extglobs.length - 1].conditions++;
+      }
+      push({ type: 'text', value });
+      continue;
+    }
+
+    /**
+     * Commas
+     */
+
+    if (value === ',') {
+      let output = value;
+
+      const brace = braces[braces.length - 1];
+      if (brace && stack[stack.length - 1] === 'braces') {
+        brace.comma = true;
+        output = '|';
+      }
+
+      push({ type: 'comma', value, output });
+      continue;
+    }
+
+    /**
+     * Slashes
+     */
+
+    if (value === '/') {
+      // if the beginning of the glob is "./", advance the start
+      // to the current index, and don't add the "./" characters
+      // to the state. This greatly simplifies lookbehinds when
+      // checking for BOS characters like "!" and "." (not "./")
+      if (prev.type === 'dot' && state.index === state.start + 1) {
+        state.start = state.index + 1;
+        state.consumed = '';
+        state.output = '';
+        tokens.pop();
+        prev = bos; // reset "prev" to the first token
+        continue;
+      }
+
+      push({ type: 'slash', value, output: SLASH_LITERAL });
+      continue;
+    }
+
+    /**
+     * Dots
+     */
+
+    if (value === '.') {
+      if (state.braces > 0 && prev.type === 'dot') {
+        if (prev.value === '.') prev.output = DOT_LITERAL;
+        const brace = braces[braces.length - 1];
+        prev.type = 'dots';
+        prev.output += value;
+        prev.value += value;
+        brace.dots = true;
+        continue;
+      }
+
+      if ((state.braces + state.parens) === 0 && prev.type !== 'bos' && prev.type !== 'slash') {
+        push({ type: 'text', value, output: DOT_LITERAL });
+        continue;
+      }
+
+      push({ type: 'dot', value, output: DOT_LITERAL });
+      continue;
+    }
+
+    /**
+     * Question marks
+     */
+
+    if (value === '?') {
+      const isGroup = prev && prev.value === '(';
+      if (!isGroup && opts.noextglob !== true && peek() === '(' && peek(2) !== '?') {
+        extglobOpen('qmark', value);
+        continue;
+      }
+
+      if (prev && prev.type === 'paren') {
+        const next = peek();
+        let output = value;
+
+        if (next === '<' && !utils.supportsLookbehinds()) {
+          throw new Error('Node.js v10 or higher is required for regex lookbehinds');
+        }
+
+        if ((prev.value === '(' && !/[!=<:]/.test(next)) || (next === '<' && !/<([!=]|\w+>)/.test(remaining()))) {
+          output = `\\${value}`;
+        }
+
+        push({ type: 'text', value, output });
+        continue;
+      }
+
+      if (opts.dot !== true && (prev.type === 'slash' || prev.type === 'bos')) {
+        push({ type: 'qmark', value, output: QMARK_NO_DOT });
+        continue;
+      }
+
+      push({ type: 'qmark', value, output: QMARK });
+      continue;
+    }
+
+    /**
+     * Exclamation
+     */
+
+    if (value === '!') {
+      if (opts.noextglob !== true && peek() === '(') {
+        if (peek(2) !== '?' || !/[!=<:]/.test(peek(3))) {
+          extglobOpen('negate', value);
+          continue;
+        }
+      }
+
+      if (opts.nonegate !== true && state.index === 0) {
+        negate();
+        continue;
+      }
+    }
+
+    /**
+     * Plus
+     */
+
+    if (value === '+') {
+      if (opts.noextglob !== true && peek() === '(' && peek(2) !== '?') {
+        extglobOpen('plus', value);
+        continue;
+      }
+
+      if ((prev && prev.value === '(') || opts.regex === false) {
+        push({ type: 'plus', value, output: PLUS_LITERAL });
+        continue;
+      }
+
+      if ((prev && (prev.type === 'bracket' || prev.type === 'paren' || prev.type === 'brace')) || state.parens > 0) {
+        push({ type: 'plus', value });
+        continue;
+      }
+
+      push({ type: 'plus', value: PLUS_LITERAL });
+      continue;
+    }
+
+    /**
+     * Plain text
+     */
+
+    if (value === '@') {
+      if (opts.noextglob !== true && peek() === '(' && peek(2) !== '?') {
+        push({ type: 'at', extglob: true, value, output: '' });
+        continue;
+      }
+
+      push({ type: 'text', value });
+      continue;
+    }
+
+    /**
+     * Plain text
+     */
+
+    if (value !== '*') {
+      if (value === '$' || value === '^') {
+        value = `\\${value}`;
+      }
+
+      const match = REGEX_NON_SPECIAL_CHARS.exec(remaining());
+      if (match) {
+        value += match[0];
+        state.index += match[0].length;
+      }
+
+      push({ type: 'text', value });
+      continue;
+    }
+
+    /**
+     * Stars
+     */
+
+    if (prev && (prev.type === 'globstar' || prev.star === true)) {
+      prev.type = 'star';
+      prev.star = true;
+      prev.value += value;
+      prev.output = star;
+      state.backtrack = true;
+      state.globstar = true;
+      consume(value);
+      continue;
+    }
+
+    let rest = remaining();
+    if (opts.noextglob !== true && /^\([^?]/.test(rest)) {
+      extglobOpen('star', value);
+      continue;
+    }
+
+    if (prev.type === 'star') {
+      if (opts.noglobstar === true) {
+        consume(value);
+        continue;
+      }
+
+      const prior = prev.prev;
+      const before = prior.prev;
+      const isStart = prior.type === 'slash' || prior.type === 'bos';
+      const afterStar = before && (before.type === 'star' || before.type === 'globstar');
+
+      if (opts.bash === true && (!isStart || (rest[0] && rest[0] !== '/'))) {
+        push({ type: 'star', value, output: '' });
+        continue;
+      }
+
+      const isBrace = state.braces > 0 && (prior.type === 'comma' || prior.type === 'brace');
+      const isExtglob = extglobs.length && (prior.type === 'pipe' || prior.type === 'paren');
+      if (!isStart && prior.type !== 'paren' && !isBrace && !isExtglob) {
+        push({ type: 'star', value, output: '' });
+        continue;
+      }
+
+      // strip consecutive `/**/`
+      while (rest.slice(0, 3) === '/**') {
+        const after = input[state.index + 4];
+        if (after && after !== '/') {
+          break;
+        }
+        rest = rest.slice(3);
+        consume('/**', 3);
+      }
+
+      if (prior.type === 'bos' && eos()) {
+        prev.type = 'globstar';
+        prev.value += value;
+        prev.output = globstar(opts);
+        state.output = prev.output;
+        state.globstar = true;
+        consume(value);
+        continue;
+      }
+
+      if (prior.type === 'slash' && prior.prev.type !== 'bos' && !afterStar && eos()) {
+        state.output = state.output.slice(0, -(prior.output + prev.output).length);
+        prior.output = `(?:${prior.output}`;
+
+        prev.type = 'globstar';
+        prev.output = globstar(opts) + (opts.strictSlashes ? ')' : '|$)');
+        prev.value += value;
+        state.globstar = true;
+        state.output += prior.output + prev.output;
+        consume(value);
+        continue;
+      }
+
+      if (prior.type === 'slash' && prior.prev.type !== 'bos' && rest[0] === '/') {
+        const end = rest[1] !== void 0 ? '|$' : '';
+
+        state.output = state.output.slice(0, -(prior.output + prev.output).length);
+        prior.output = `(?:${prior.output}`;
+
+        prev.type = 'globstar';
+        prev.output = `${globstar(opts)}${SLASH_LITERAL}|${SLASH_LITERAL}${end})`;
+        prev.value += value;
+
+        state.output += prior.output + prev.output;
+        state.globstar = true;
+
+        consume(value + advance());
+
+        push({ type: 'slash', value: '/', output: '' });
+        continue;
+      }
+
+      if (prior.type === 'bos' && rest[0] === '/') {
+        prev.type = 'globstar';
+        prev.value += value;
+        prev.output = `(?:^|${SLASH_LITERAL}|${globstar(opts)}${SLASH_LITERAL})`;
+        state.output = prev.output;
+        state.globstar = true;
+        consume(value + advance());
+        push({ type: 'slash', value: '/', output: '' });
+        continue;
+      }
+
+      // remove single star from output
+      state.output = state.output.slice(0, -prev.output.length);
+
+      // reset previous token to globstar
+      prev.type = 'globstar';
+      prev.output = globstar(opts);
+      prev.value += value;
+
+      // reset output with globstar
+      state.output += prev.output;
+      state.globstar = true;
+      consume(value);
+      continue;
+    }
+
+    const token = { type: 'star', value, output: star };
+
+    if (opts.bash === true) {
+      token.output = '.*?';
+      if (prev.type === 'bos' || prev.type === 'slash') {
+        token.output = nodot + token.output;
+      }
+      push(token);
+      continue;
+    }
+
+    if (prev && (prev.type === 'bracket' || prev.type === 'paren') && opts.regex === true) {
+      token.output = value;
+      push(token);
+      continue;
+    }
+
+    if (state.index === state.start || prev.type === 'slash' || prev.type === 'dot') {
+      if (prev.type === 'dot') {
+        state.output += NO_DOT_SLASH;
+        prev.output += NO_DOT_SLASH;
+
+      } else if (opts.dot === true) {
+        state.output += NO_DOTS_SLASH;
+        prev.output += NO_DOTS_SLASH;
+
+      } else {
+        state.output += nodot;
+        prev.output += nodot;
+      }
+
+      if (peek() !== '*') {
+        state.output += ONE_CHAR;
+        prev.output += ONE_CHAR;
+      }
+    }
+
+    push(token);
+  }
+
+  while (state.brackets > 0) {
+    if (opts.strictBrackets === true) throw new SyntaxError(syntaxError('closing', ']'));
+    state.output = utils.escapeLast(state.output, '[');
+    decrement('brackets');
+  }
+
+  while (state.parens > 0) {
+    if (opts.strictBrackets === true) throw new SyntaxError(syntaxError('closing', ')'));
+    state.output = utils.escapeLast(state.output, '(');
+    decrement('parens');
+  }
+
+  while (state.braces > 0) {
+    if (opts.strictBrackets === true) throw new SyntaxError(syntaxError('closing', '}'));
+    state.output = utils.escapeLast(state.output, '{');
+    decrement('braces');
+  }
+
+  if (opts.strictSlashes !== true && (prev.type === 'star' || prev.type === 'bracket')) {
+    push({ type: 'maybe_slash', value: '', output: `${SLASH_LITERAL}?` });
+  }
+
+  // rebuild the output if we had to backtrack at any point
+  if (state.backtrack === true) {
+    state.output = '';
+
+    for (const token of state.tokens) {
+      state.output += token.output != null ? token.output : token.value;
+
+      if (token.suffix) {
+        state.output += token.suffix;
+      }
+    }
+  }
+
+  return state;
+};
+
+/**
+ * Fast paths for creating regular expressions for common glob patterns.
+ * This can significantly speed up processing and has very little downside
+ * impact when none of the fast paths match.
+ */
+
+parse.fastpaths = (input, options) => {
+  const opts = { ...options };
+  const max = typeof opts.maxLength === 'number' ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
+  const len = input.length;
+  if (len > max) {
+    throw new SyntaxError(`Input length: ${len}, exceeds maximum allowed length: ${max}`);
+  }
+
+  input = REPLACEMENTS[input] || input;
+  const win32 = utils.isWindows(options);
+
+  // create constants based on platform, for windows or posix
+  const {
+    DOT_LITERAL,
+    SLASH_LITERAL,
+    ONE_CHAR,
+    DOTS_SLASH,
+    NO_DOT,
+    NO_DOTS,
+    NO_DOTS_SLASH,
+    STAR,
+    START_ANCHOR
+  } = constants.globChars(win32);
+
+  const nodot = opts.dot ? NO_DOTS : NO_DOT;
+  const slashDot = opts.dot ? NO_DOTS_SLASH : NO_DOT;
+  const capture = opts.capture ? '' : '?:';
+  const state = { negated: false, prefix: '' };
+  let star = opts.bash === true ? '.*?' : STAR;
+
+  if (opts.capture) {
+    star = `(${star})`;
+  }
+
+  const globstar = opts => {
+    if (opts.noglobstar === true) return star;
+    return `(${capture}(?:(?!${START_ANCHOR}${opts.dot ? DOTS_SLASH : DOT_LITERAL}).)*?)`;
+  };
+
+  const create = str => {
+    switch (str) {
+      case '*':
+        return `${nodot}${ONE_CHAR}${star}`;
+
+      case '.*':
+        return `${DOT_LITERAL}${ONE_CHAR}${star}`;
+
+      case '*.*':
+        return `${nodot}${star}${DOT_LITERAL}${ONE_CHAR}${star}`;
+
+      case '*/*':
+        return `${nodot}${star}${SLASH_LITERAL}${ONE_CHAR}${slashDot}${star}`;
+
+      case '**':
+        return nodot + globstar(opts);
+
+      case '**/*':
+        return `(?:${nodot}${globstar(opts)}${SLASH_LITERAL})?${slashDot}${ONE_CHAR}${star}`;
+
+      case '**/*.*':
+        return `(?:${nodot}${globstar(opts)}${SLASH_LITERAL})?${slashDot}${star}${DOT_LITERAL}${ONE_CHAR}${star}`;
+
+      case '**/.*':
+        return `(?:${nodot}${globstar(opts)}${SLASH_LITERAL})?${DOT_LITERAL}${ONE_CHAR}${star}`;
+
+      default: {
+        const match = /^(.*?)\.(\w+)$/.exec(str);
+        if (!match) return;
+
+        const source = create(match[1]);
+        if (!source) return;
+
+        return source + DOT_LITERAL + match[2];
+      }
+    }
+  };
+
+  const output = utils.removePrefix(input, state);
+  let source = create(output);
+
+  if (source && opts.strictSlashes !== true) {
+    source += `${SLASH_LITERAL}?`;
+  }
+
+  return source;
+};
+
+module.exports = parse;
+
+
+/***/ }),
+
+/***/ 3322:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const path = __nccwpck_require__(1017);
+const scan = __nccwpck_require__(2429);
+const parse = __nccwpck_require__(2139);
+const utils = __nccwpck_require__(479);
+const constants = __nccwpck_require__(6099);
+const isObject = val => val && typeof val === 'object' && !Array.isArray(val);
+
+/**
+ * Creates a matcher function from one or more glob patterns. The
+ * returned function takes a string to match as its first argument,
+ * and returns true if the string is a match. The returned matcher
+ * function also takes a boolean as the second argument that, when true,
+ * returns an object with additional information.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch(glob[, options]);
+ *
+ * const isMatch = picomatch('*.!(*a)');
+ * console.log(isMatch('a.a')); //=> false
+ * console.log(isMatch('a.b')); //=> true
+ * ```
+ * @name picomatch
+ * @param {String|Array} `globs` One or more glob patterns.
+ * @param {Object=} `options`
+ * @return {Function=} Returns a matcher function.
+ * @api public
+ */
+
+const picomatch = (glob, options, returnState = false) => {
+  if (Array.isArray(glob)) {
+    const fns = glob.map(input => picomatch(input, options, returnState));
+    const arrayMatcher = str => {
+      for (const isMatch of fns) {
+        const state = isMatch(str);
+        if (state) return state;
+      }
+      return false;
+    };
+    return arrayMatcher;
+  }
+
+  const isState = isObject(glob) && glob.tokens && glob.input;
+
+  if (glob === '' || (typeof glob !== 'string' && !isState)) {
+    throw new TypeError('Expected pattern to be a non-empty string');
+  }
+
+  const opts = options || {};
+  const posix = utils.isWindows(options);
+  const regex = isState
+    ? picomatch.compileRe(glob, options)
+    : picomatch.makeRe(glob, options, false, true);
+
+  const state = regex.state;
+  delete regex.state;
+
+  let isIgnored = () => false;
+  if (opts.ignore) {
+    const ignoreOpts = { ...options, ignore: null, onMatch: null, onResult: null };
+    isIgnored = picomatch(opts.ignore, ignoreOpts, returnState);
+  }
+
+  const matcher = (input, returnObject = false) => {
+    const { isMatch, match, output } = picomatch.test(input, regex, options, { glob, posix });
+    const result = { glob, state, regex, posix, input, output, match, isMatch };
+
+    if (typeof opts.onResult === 'function') {
+      opts.onResult(result);
+    }
+
+    if (isMatch === false) {
+      result.isMatch = false;
+      return returnObject ? result : false;
+    }
+
+    if (isIgnored(input)) {
+      if (typeof opts.onIgnore === 'function') {
+        opts.onIgnore(result);
+      }
+      result.isMatch = false;
+      return returnObject ? result : false;
+    }
+
+    if (typeof opts.onMatch === 'function') {
+      opts.onMatch(result);
+    }
+    return returnObject ? result : true;
+  };
+
+  if (returnState) {
+    matcher.state = state;
+  }
+
+  return matcher;
+};
+
+/**
+ * Test `input` with the given `regex`. This is used by the main
+ * `picomatch()` function to test the input string.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch.test(input, regex[, options]);
+ *
+ * console.log(picomatch.test('foo/bar', /^(?:([^/]*?)\/([^/]*?))$/));
+ * // { isMatch: true, match: [ 'foo/', 'foo', 'bar' ], output: 'foo/bar' }
+ * ```
+ * @param {String} `input` String to test.
+ * @param {RegExp} `regex`
+ * @return {Object} Returns an object with matching info.
+ * @api public
+ */
+
+picomatch.test = (input, regex, options, { glob, posix } = {}) => {
+  if (typeof input !== 'string') {
+    throw new TypeError('Expected input to be a string');
+  }
+
+  if (input === '') {
+    return { isMatch: false, output: '' };
+  }
+
+  const opts = options || {};
+  const format = opts.format || (posix ? utils.toPosixSlashes : null);
+  let match = input === glob;
+  let output = (match && format) ? format(input) : input;
+
+  if (match === false) {
+    output = format ? format(input) : input;
+    match = output === glob;
+  }
+
+  if (match === false || opts.capture === true) {
+    if (opts.matchBase === true || opts.basename === true) {
+      match = picomatch.matchBase(input, regex, options, posix);
+    } else {
+      match = regex.exec(output);
+    }
+  }
+
+  return { isMatch: Boolean(match), match, output };
+};
+
+/**
+ * Match the basename of a filepath.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch.matchBase(input, glob[, options]);
+ * console.log(picomatch.matchBase('foo/bar.js', '*.js'); // true
+ * ```
+ * @param {String} `input` String to test.
+ * @param {RegExp|String} `glob` Glob pattern or regex created by [.makeRe](#makeRe).
+ * @return {Boolean}
+ * @api public
+ */
+
+picomatch.matchBase = (input, glob, options, posix = utils.isWindows(options)) => {
+  const regex = glob instanceof RegExp ? glob : picomatch.makeRe(glob, options);
+  return regex.test(path.basename(input));
+};
+
+/**
+ * Returns true if **any** of the given glob `patterns` match the specified `string`.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch.isMatch(string, patterns[, options]);
+ *
+ * console.log(picomatch.isMatch('a.a', ['b.*', '*.a'])); //=> true
+ * console.log(picomatch.isMatch('a.a', 'b.*')); //=> false
+ * ```
+ * @param {String|Array} str The string to test.
+ * @param {String|Array} patterns One or more glob patterns to use for matching.
+ * @param {Object} [options] See available [options](#options).
+ * @return {Boolean} Returns true if any patterns match `str`
+ * @api public
+ */
+
+picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
+
+/**
+ * Parse a glob pattern to create the source string for a regular
+ * expression.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * const result = picomatch.parse(pattern[, options]);
+ * ```
+ * @param {String} `pattern`
+ * @param {Object} `options`
+ * @return {Object} Returns an object with useful properties and output to be used as a regex source string.
+ * @api public
+ */
+
+picomatch.parse = (pattern, options) => {
+  if (Array.isArray(pattern)) return pattern.map(p => picomatch.parse(p, options));
+  return parse(pattern, { ...options, fastpaths: false });
+};
+
+/**
+ * Scan a glob pattern to separate the pattern into segments.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch.scan(input[, options]);
+ *
+ * const result = picomatch.scan('!./foo/*.js');
+ * console.log(result);
+ * { prefix: '!./',
+ *   input: '!./foo/*.js',
+ *   start: 3,
+ *   base: 'foo',
+ *   glob: '*.js',
+ *   isBrace: false,
+ *   isBracket: false,
+ *   isGlob: true,
+ *   isExtglob: false,
+ *   isGlobstar: false,
+ *   negated: true }
+ * ```
+ * @param {String} `input` Glob pattern to scan.
+ * @param {Object} `options`
+ * @return {Object} Returns an object with
+ * @api public
+ */
+
+picomatch.scan = (input, options) => scan(input, options);
+
+/**
+ * Compile a regular expression from the `state` object returned by the
+ * [parse()](#parse) method.
+ *
+ * @param {Object} `state`
+ * @param {Object} `options`
+ * @param {Boolean} `returnOutput` Intended for implementors, this argument allows you to return the raw output from the parser.
+ * @param {Boolean} `returnState` Adds the state to a `state` property on the returned regex. Useful for implementors and debugging.
+ * @return {RegExp}
+ * @api public
+ */
+
+picomatch.compileRe = (state, options, returnOutput = false, returnState = false) => {
+  if (returnOutput === true) {
+    return state.output;
+  }
+
+  const opts = options || {};
+  const prepend = opts.contains ? '' : '^';
+  const append = opts.contains ? '' : '$';
+
+  let source = `${prepend}(?:${state.output})${append}`;
+  if (state && state.negated === true) {
+    source = `^(?!${source}).*$`;
+  }
+
+  const regex = picomatch.toRegex(source, options);
+  if (returnState === true) {
+    regex.state = state;
+  }
+
+  return regex;
+};
+
+/**
+ * Create a regular expression from a parsed glob pattern.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * const state = picomatch.parse('*.js');
+ * // picomatch.compileRe(state[, options]);
+ *
+ * console.log(picomatch.compileRe(state));
+ * //=> /^(?:(?!\.)(?=.)[^/]*?\.js)$/
+ * ```
+ * @param {String} `state` The object returned from the `.parse` method.
+ * @param {Object} `options`
+ * @param {Boolean} `returnOutput` Implementors may use this argument to return the compiled output, instead of a regular expression. This is not exposed on the options to prevent end-users from mutating the result.
+ * @param {Boolean} `returnState` Implementors may use this argument to return the state from the parsed glob with the returned regular expression.
+ * @return {RegExp} Returns a regex created from the given pattern.
+ * @api public
+ */
+
+picomatch.makeRe = (input, options = {}, returnOutput = false, returnState = false) => {
+  if (!input || typeof input !== 'string') {
+    throw new TypeError('Expected a non-empty string');
+  }
+
+  let parsed = { negated: false, fastpaths: true };
+
+  if (options.fastpaths !== false && (input[0] === '.' || input[0] === '*')) {
+    parsed.output = parse.fastpaths(input, options);
+  }
+
+  if (!parsed.output) {
+    parsed = parse(input, options);
+  }
+
+  return picomatch.compileRe(parsed, options, returnOutput, returnState);
+};
+
+/**
+ * Create a regular expression from the given regex source string.
+ *
+ * ```js
+ * const picomatch = require('picomatch');
+ * // picomatch.toRegex(source[, options]);
+ *
+ * const { output } = picomatch.parse('*.js');
+ * console.log(picomatch.toRegex(output));
+ * //=> /^(?:(?!\.)(?=.)[^/]*?\.js)$/
+ * ```
+ * @param {String} `source` Regular expression source string.
+ * @param {Object} `options`
+ * @return {RegExp}
+ * @api public
+ */
+
+picomatch.toRegex = (source, options) => {
+  try {
+    const opts = options || {};
+    return new RegExp(source, opts.flags || (opts.nocase ? 'i' : ''));
+  } catch (err) {
+    if (options && options.debug === true) throw err;
+    return /$^/;
+  }
+};
+
+/**
+ * Picomatch constants.
+ * @return {Object}
+ */
+
+picomatch.constants = constants;
+
+/**
+ * Expose "picomatch"
+ */
+
+module.exports = picomatch;
+
+
+/***/ }),
+
+/***/ 2429:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const utils = __nccwpck_require__(479);
+const {
+  CHAR_ASTERISK,             /* * */
+  CHAR_AT,                   /* @ */
+  CHAR_BACKWARD_SLASH,       /* \ */
+  CHAR_COMMA,                /* , */
+  CHAR_DOT,                  /* . */
+  CHAR_EXCLAMATION_MARK,     /* ! */
+  CHAR_FORWARD_SLASH,        /* / */
+  CHAR_LEFT_CURLY_BRACE,     /* { */
+  CHAR_LEFT_PARENTHESES,     /* ( */
+  CHAR_LEFT_SQUARE_BRACKET,  /* [ */
+  CHAR_PLUS,                 /* + */
+  CHAR_QUESTION_MARK,        /* ? */
+  CHAR_RIGHT_CURLY_BRACE,    /* } */
+  CHAR_RIGHT_PARENTHESES,    /* ) */
+  CHAR_RIGHT_SQUARE_BRACKET  /* ] */
+} = __nccwpck_require__(6099);
+
+const isPathSeparator = code => {
+  return code === CHAR_FORWARD_SLASH || code === CHAR_BACKWARD_SLASH;
+};
+
+const depth = token => {
+  if (token.isPrefix !== true) {
+    token.depth = token.isGlobstar ? Infinity : 1;
+  }
+};
+
+/**
+ * Quickly scans a glob pattern and returns an object with a handful of
+ * useful properties, like `isGlob`, `path` (the leading non-glob, if it exists),
+ * `glob` (the actual pattern), `negated` (true if the path starts with `!` but not
+ * with `!(`) and `negatedExtglob` (true if the path starts with `!(`).
+ *
+ * ```js
+ * const pm = require('picomatch');
+ * console.log(pm.scan('foo/bar/*.js'));
+ * { isGlob: true, input: 'foo/bar/*.js', base: 'foo/bar', glob: '*.js' }
+ * ```
+ * @param {String} `str`
+ * @param {Object} `options`
+ * @return {Object} Returns an object with tokens and regex source string.
+ * @api public
+ */
+
+const scan = (input, options) => {
+  const opts = options || {};
+
+  const length = input.length - 1;
+  const scanToEnd = opts.parts === true || opts.scanToEnd === true;
+  const slashes = [];
+  const tokens = [];
+  const parts = [];
+
+  let str = input;
+  let index = -1;
+  let start = 0;
+  let lastIndex = 0;
+  let isBrace = false;
+  let isBracket = false;
+  let isGlob = false;
+  let isExtglob = false;
+  let isGlobstar = false;
+  let braceEscaped = false;
+  let backslashes = false;
+  let negated = false;
+  let negatedExtglob = false;
+  let finished = false;
+  let braces = 0;
+  let prev;
+  let code;
+  let token = { value: '', depth: 0, isGlob: false };
+
+  const eos = () => index >= length;
+  const peek = () => str.charCodeAt(index + 1);
+  const advance = () => {
+    prev = code;
+    return str.charCodeAt(++index);
+  };
+
+  while (index < length) {
+    code = advance();
+    let next;
+
+    if (code === CHAR_BACKWARD_SLASH) {
+      backslashes = token.backslashes = true;
+      code = advance();
+
+      if (code === CHAR_LEFT_CURLY_BRACE) {
+        braceEscaped = true;
+      }
+      continue;
+    }
+
+    if (braceEscaped === true || code === CHAR_LEFT_CURLY_BRACE) {
+      braces++;
+
+      while (eos() !== true && (code = advance())) {
+        if (code === CHAR_BACKWARD_SLASH) {
+          backslashes = token.backslashes = true;
+          advance();
+          continue;
+        }
+
+        if (code === CHAR_LEFT_CURLY_BRACE) {
+          braces++;
+          continue;
+        }
+
+        if (braceEscaped !== true && code === CHAR_DOT && (code = advance()) === CHAR_DOT) {
+          isBrace = token.isBrace = true;
+          isGlob = token.isGlob = true;
+          finished = true;
+
+          if (scanToEnd === true) {
+            continue;
+          }
+
+          break;
+        }
+
+        if (braceEscaped !== true && code === CHAR_COMMA) {
+          isBrace = token.isBrace = true;
+          isGlob = token.isGlob = true;
+          finished = true;
+
+          if (scanToEnd === true) {
+            continue;
+          }
+
+          break;
+        }
+
+        if (code === CHAR_RIGHT_CURLY_BRACE) {
+          braces--;
+
+          if (braces === 0) {
+            braceEscaped = false;
+            isBrace = token.isBrace = true;
+            finished = true;
+            break;
+          }
+        }
+      }
+
+      if (scanToEnd === true) {
+        continue;
+      }
+
+      break;
+    }
+
+    if (code === CHAR_FORWARD_SLASH) {
+      slashes.push(index);
+      tokens.push(token);
+      token = { value: '', depth: 0, isGlob: false };
+
+      if (finished === true) continue;
+      if (prev === CHAR_DOT && index === (start + 1)) {
+        start += 2;
+        continue;
+      }
+
+      lastIndex = index + 1;
+      continue;
+    }
+
+    if (opts.noext !== true) {
+      const isExtglobChar = code === CHAR_PLUS
+        || code === CHAR_AT
+        || code === CHAR_ASTERISK
+        || code === CHAR_QUESTION_MARK
+        || code === CHAR_EXCLAMATION_MARK;
+
+      if (isExtglobChar === true && peek() === CHAR_LEFT_PARENTHESES) {
+        isGlob = token.isGlob = true;
+        isExtglob = token.isExtglob = true;
+        finished = true;
+        if (code === CHAR_EXCLAMATION_MARK && index === start) {
+          negatedExtglob = true;
+        }
+
+        if (scanToEnd === true) {
+          while (eos() !== true && (code = advance())) {
+            if (code === CHAR_BACKWARD_SLASH) {
+              backslashes = token.backslashes = true;
+              code = advance();
+              continue;
+            }
+
+            if (code === CHAR_RIGHT_PARENTHESES) {
+              isGlob = token.isGlob = true;
+              finished = true;
+              break;
+            }
+          }
+          continue;
+        }
+        break;
+      }
+    }
+
+    if (code === CHAR_ASTERISK) {
+      if (prev === CHAR_ASTERISK) isGlobstar = token.isGlobstar = true;
+      isGlob = token.isGlob = true;
+      finished = true;
+
+      if (scanToEnd === true) {
+        continue;
+      }
+      break;
+    }
+
+    if (code === CHAR_QUESTION_MARK) {
+      isGlob = token.isGlob = true;
+      finished = true;
+
+      if (scanToEnd === true) {
+        continue;
+      }
+      break;
+    }
+
+    if (code === CHAR_LEFT_SQUARE_BRACKET) {
+      while (eos() !== true && (next = advance())) {
+        if (next === CHAR_BACKWARD_SLASH) {
+          backslashes = token.backslashes = true;
+          advance();
+          continue;
+        }
+
+        if (next === CHAR_RIGHT_SQUARE_BRACKET) {
+          isBracket = token.isBracket = true;
+          isGlob = token.isGlob = true;
+          finished = true;
+          break;
+        }
+      }
+
+      if (scanToEnd === true) {
+        continue;
+      }
+
+      break;
+    }
+
+    if (opts.nonegate !== true && code === CHAR_EXCLAMATION_MARK && index === start) {
+      negated = token.negated = true;
+      start++;
+      continue;
+    }
+
+    if (opts.noparen !== true && code === CHAR_LEFT_PARENTHESES) {
+      isGlob = token.isGlob = true;
+
+      if (scanToEnd === true) {
+        while (eos() !== true && (code = advance())) {
+          if (code === CHAR_LEFT_PARENTHESES) {
+            backslashes = token.backslashes = true;
+            code = advance();
+            continue;
+          }
+
+          if (code === CHAR_RIGHT_PARENTHESES) {
+            finished = true;
+            break;
+          }
+        }
+        continue;
+      }
+      break;
+    }
+
+    if (isGlob === true) {
+      finished = true;
+
+      if (scanToEnd === true) {
+        continue;
+      }
+
+      break;
+    }
+  }
+
+  if (opts.noext === true) {
+    isExtglob = false;
+    isGlob = false;
+  }
+
+  let base = str;
+  let prefix = '';
+  let glob = '';
+
+  if (start > 0) {
+    prefix = str.slice(0, start);
+    str = str.slice(start);
+    lastIndex -= start;
+  }
+
+  if (base && isGlob === true && lastIndex > 0) {
+    base = str.slice(0, lastIndex);
+    glob = str.slice(lastIndex);
+  } else if (isGlob === true) {
+    base = '';
+    glob = str;
+  } else {
+    base = str;
+  }
+
+  if (base && base !== '' && base !== '/' && base !== str) {
+    if (isPathSeparator(base.charCodeAt(base.length - 1))) {
+      base = base.slice(0, -1);
+    }
+  }
+
+  if (opts.unescape === true) {
+    if (glob) glob = utils.removeBackslashes(glob);
+
+    if (base && backslashes === true) {
+      base = utils.removeBackslashes(base);
+    }
+  }
+
+  const state = {
+    prefix,
+    input,
+    start,
+    base,
+    glob,
+    isBrace,
+    isBracket,
+    isGlob,
+    isExtglob,
+    isGlobstar,
+    negated,
+    negatedExtglob
+  };
+
+  if (opts.tokens === true) {
+    state.maxDepth = 0;
+    if (!isPathSeparator(code)) {
+      tokens.push(token);
+    }
+    state.tokens = tokens;
+  }
+
+  if (opts.parts === true || opts.tokens === true) {
+    let prevIndex;
+
+    for (let idx = 0; idx < slashes.length; idx++) {
+      const n = prevIndex ? prevIndex + 1 : start;
+      const i = slashes[idx];
+      const value = input.slice(n, i);
+      if (opts.tokens) {
+        if (idx === 0 && start !== 0) {
+          tokens[idx].isPrefix = true;
+          tokens[idx].value = prefix;
+        } else {
+          tokens[idx].value = value;
+        }
+        depth(tokens[idx]);
+        state.maxDepth += tokens[idx].depth;
+      }
+      if (idx !== 0 || value !== '') {
+        parts.push(value);
+      }
+      prevIndex = i;
+    }
+
+    if (prevIndex && prevIndex + 1 < input.length) {
+      const value = input.slice(prevIndex + 1);
+      parts.push(value);
+
+      if (opts.tokens) {
+        tokens[tokens.length - 1].value = value;
+        depth(tokens[tokens.length - 1]);
+        state.maxDepth += tokens[tokens.length - 1].depth;
+      }
+    }
+
+    state.slashes = slashes;
+    state.parts = parts;
+  }
+
+  return state;
+};
+
+module.exports = scan;
+
+
+/***/ }),
+
+/***/ 479:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const path = __nccwpck_require__(1017);
+const win32 = process.platform === 'win32';
+const {
+  REGEX_BACKSLASH,
+  REGEX_REMOVE_BACKSLASH,
+  REGEX_SPECIAL_CHARS,
+  REGEX_SPECIAL_CHARS_GLOBAL
+} = __nccwpck_require__(6099);
+
+exports.isObject = val => val !== null && typeof val === 'object' && !Array.isArray(val);
+exports.hasRegexChars = str => REGEX_SPECIAL_CHARS.test(str);
+exports.isRegexChar = str => str.length === 1 && exports.hasRegexChars(str);
+exports.escapeRegex = str => str.replace(REGEX_SPECIAL_CHARS_GLOBAL, '\\$1');
+exports.toPosixSlashes = str => str.replace(REGEX_BACKSLASH, '/');
+
+exports.removeBackslashes = str => {
+  return str.replace(REGEX_REMOVE_BACKSLASH, match => {
+    return match === '\\' ? '' : match;
+  });
+};
+
+exports.supportsLookbehinds = () => {
+  const segs = process.version.slice(1).split('.').map(Number);
+  if (segs.length === 3 && segs[0] >= 9 || (segs[0] === 8 && segs[1] >= 10)) {
+    return true;
+  }
+  return false;
+};
+
+exports.isWindows = options => {
+  if (options && typeof options.windows === 'boolean') {
+    return options.windows;
+  }
+  return win32 === true || path.sep === '\\';
+};
+
+exports.escapeLast = (input, char, lastIdx) => {
+  const idx = input.lastIndexOf(char, lastIdx);
+  if (idx === -1) return input;
+  if (input[idx - 1] === '\\') return exports.escapeLast(input, char, idx - 1);
+  return `${input.slice(0, idx)}\\${input.slice(idx)}`;
+};
+
+exports.removePrefix = (input, state = {}) => {
+  let output = input;
+  if (output.startsWith('./')) {
+    output = output.slice(2);
+    state.prefix = './';
+  }
+  return output;
+};
+
+exports.wrapOutput = (input, state = {}, options = {}) => {
+  const prepend = options.contains ? '' : '^';
+  const append = options.contains ? '' : '$';
+
+  let output = `${prepend}(?:${input})${append}`;
+  if (state.negated === true) {
+    output = `(?:^(?!${output}).*$)`;
+  }
+  return output;
+};
+
+
+/***/ }),
+
 /***/ 4256:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -11924,6 +14699,14 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("os");
+
+/***/ }),
+
+/***/ 1017:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("path");
 
 /***/ }),
 
@@ -18647,6 +21430,35 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -18670,155 +21482,597 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
+// EXTERNAL MODULE: ./node_modules/@octokit/core/dist-node/index.js
+var dist_node = __nccwpck_require__(6762);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/yaml/index.js
 var yaml = __nccwpck_require__(4603);
-;// CONCATENATED MODULE: ./src/labeler.js
-const { Octokit } = __nccwpck_require__(6762)
-;
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
+var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
+;// CONCATENATED MODULE: ./src/modules/base.js
+class BaseModule {
+  MODULE_KEY = 'base'
 
-const fm = __nccwpck_require__(7646)
-const fs = __nccwpck_require__(7147)
+  constructor(objects, config) {
+    this.config = config
+    this.objects = objects
+  }
 
-const pullNumber = getPrNumber()
-const owner = 'doka-guide'
-const repo = 'content'
+  isApplicable(label, caseNumber = null) {
+    return this.config.hasOwnProperty(label)
+  }
+}
 
-async function run() {
-  try {
-    const ghKey = core.getInput('token', { required: true })
-    const configPath = core.getInput('config', { required: true })
-    const file = fs.readFileSync(configPath, 'utf8')
-    const labelRules = yaml.parse(file)
+;// CONCATENATED MODULE: ./src/modules/assignee.js
 
-    const octokit = new Octokit({ auth: ghKey })
 
-    const pullObject = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
-      owner,
-      repo,
-      pull_number: pullNumber
-    })
+class AssigneeModule extends BaseModule {
+  MODULE_KEY = 'assignee'
 
-    const labels = new Set([])
-    for (const index in pullObject.data.labels) {
-      const labelObject = pullObject.data.labels[index]
-      labels.add(labelObject.name)
+  isApplicable(label, caseNumber = null) {
+    if (typeof this.config[label] !== 'object') {
+      return undefined
     }
 
-    const fileObjects = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
-      owner,
-      repo,
-      pull_number: pullNumber
-    })
-
-    const files = {
-      added: [],
-      modified: [],
-      removed: [],
-      renamed: []
+    let config
+    if (caseNumber === null) {
+      if (this.config[label].hasOwnProperty('assignee')) {
+        config = this.config[label].assignee
+      } else {
+        return undefined
+      }
+    } else {
+      if (this.config[label].hasOwnProperty(caseNumber)
+        && this.config[label][caseNumber].hasOwnProperty('assignee')) {
+        config = this.config[label][caseNumber].assignee
+      } else {
+        return undefined
+      }
     }
 
-    console.log('Files:')
-    for (const index in fileObjects.data) {
-      const file = fileObjects.data[index]
-      if (typeof file === 'object' && file.status && file.filename) {
-        console.log(file.filename, file.status)
-        files[file.status].push(file.filename)
-        if (Object.keys(labelRules).includes('meta') && (new RegExp('.+.md', 'i')).test(file.filename)) {
-          const content = fs.readFileSync(file.filename, { encoding: 'utf8', flag: 'r' })
-          const contentMeta = fm(content)
-          for (const field in labelRules.meta) {
-            if (Object.hasOwnProperty.call(labelRules.meta, field)) {
-              const fieldRules = labelRules.meta[field]
-              if (Object.keys(contentMeta).includes(field)) {
-                const metaSelectedLabels = selectLabels([file.filename], fieldRules.files)
-                metaSelectedLabels.forEach(element => {
-                  labels.add(element)
-                })
-              }
+    const assignees = this.getArrayFromGitHubAssignees(this.objects)
+    if (Array.isArray(config)) {
+      for (let i = 0; i < config.length; i++) {
+        const a = config[i]
+        if (assignees.includes(a)) {
+          console.log(`Module — ${this.MODULE_KEY}, label - ${label}: array has applicable assignee`)
+          return true
+        }
+      }
+    } else if (typeof config === 'string') {
+      if (assignees.includes(config)) {
+        console.log(`Module — ${this.MODULE_KEY}, label - ${label}: string has applicable assignee`)
+        return true
+      }
+    } else {
+      return undefined
+    }
+
+    return false
+  }
+
+  getArrayFromGitHubAssignees(assigneesObject) {
+    const assignees = []
+    for (const key in assigneesObject) {
+      if (Object.hasOwnProperty.call(assigneesObject, key)) {
+        const a = assigneesObject[key]
+        assignees.push(a.login)
+      }
+    }
+    return assignees
+  }
+}
+
+// EXTERNAL MODULE: ./node_modules/picomatch/index.js
+var picomatch = __nccwpck_require__(8569);
+var picomatch_default = /*#__PURE__*/__nccwpck_require__.n(picomatch);
+;// CONCATENATED MODULE: ./src/modules/files.js
+
+
+
+const FILE_STATUSES = [
+  'added',
+  'modified',
+  'removed',
+  'renamed'
+]
+
+class FilesModule extends BaseModule {
+  MODULE_KEY = 'files'
+
+  isApplicable(label, caseNumber = null) {
+    if (caseNumber === 0) {
+      return this.hasApplicableFiles(this.objects, label, 0)
+    }
+    return this.hasApplicableFiles(this.objects, label, caseNumber || null)
+  }
+
+  hasApplicableFiles(fileObjects, label, caseNumber) {
+    if (typeof this.config[label] !== 'object') {
+      return undefined
+    }
+    let config = null
+    if (caseNumber === null) {
+      if (this.config[label].hasOwnProperty('files')) {
+        config = this.config[label].files
+      } else {
+        return undefined
+      }
+    } else {
+      if (this.config[label].hasOwnProperty(caseNumber)
+        && this.config[label][caseNumber].hasOwnProperty('files')) {
+        config = this.config[label][caseNumber].files
+      } else {
+        return undefined
+      }
+    }
+
+    if (typeof config === 'string') {
+      return this.areFilesApplicable(fileObjects, label, [config])
+    } else if (Array.isArray(config)) {
+      return this.areFilesApplicable(fileObjects, label, [...config])
+    } else if (typeof config === 'object') {
+      FILE_STATUSES.forEach(s => {
+        if (config.hasOwnProperty(s)) {
+          if (typeof config[s] === 'string') {
+            const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+            if (result) {
+              return result
+            }
+          } else if (Array.isArray(config[s])) {
+            const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+            if (result) {
+              return result
             }
           }
         }
+      })
+
+    } else {
+      return undefined
+    }
+  }
+
+  areFilesApplicable(fileObjects, label, patterns, status = null) {
+    if (Array.isArray(patterns)) {
+      let fileList = this.getArrayFromGitHubFiles(fileObjects, status || null)
+      if (Array.isArray(fileList) && fileList.length > 0) {
+        console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
+      } else {
+        return false
+      }
+
+      for (let i = 0; i < patterns.length; i++) {
+        const isMatch = picomatch_default()(patterns[i])
+        const filteredList = fileList.filter(p => isMatch(p))
+        if (filteredList.length > 0) {
+          filteredList.forEach(f => {
+            console.log(`File "${f}" is taken into account`)
+          })
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  getArrayFromGitHubFiles(fileObjects, status = null) {
+    const fileList = []
+    for (const i in fileObjects) {
+      const file = fileObjects[i]
+      if (status !== null) {
+        if (typeof file === 'object' && file.status === status && file.filename) {
+          fileList.push(file.filename)
+        }
+      } else {
+        if (typeof file === 'object' && file.status && file.filename) {
+          fileList.push(file.filename)
+        }
+      }
+    }
+    return fileList
+  }
+}
+
+// EXTERNAL MODULE: ./node_modules/front-matter/index.js
+var front_matter = __nccwpck_require__(7646);
+var front_matter_default = /*#__PURE__*/__nccwpck_require__.n(front_matter);
+;// CONCATENATED MODULE: ./src/modules/frontmatter.js
+
+
+
+
+class FrontmatterModule extends BaseModule {
+  MODULE_KEY = 'frontmatter'
+
+  isApplicable(label, caseNumber = null) {
+    if (typeof this.config[label] !== 'object') {
+      return undefined
+    }
+
+    let config
+    if (caseNumber === null) {
+      if (this.config[label].hasOwnProperty('meta')) {
+        config = this.config[label].meta
+      } else {
+        return undefined
+      }
+    } else {
+      if (this.config[label].hasOwnProperty(caseNumber)
+        && this.config[label][caseNumber].hasOwnProperty('meta')) {
+        config = this.config[label][caseNumber].meta
+      } else {
+        return undefined
       }
     }
 
-    const selectedFileLabels = selectLabels(files, labelRules.files)
-    selectedFileLabels.forEach(element => {
-      labels.add(element)
-    })
-
-    if (Object.keys(pullObject).includes('assignee')) {
-      pullObject.assignee.forEach(person => {
-        if (Object.keys(labelRules.assignee).includes(person)) {
-          const assigneeSelectedLabel = selectLabels(files, labelRules.assignee[person])
-          assigneeSelectedLabel.forEach(element => {
-            labels.add(element)
-          })
+    const files = this.getMarkdownFiles(this.objects, label)
+    if (Array.isArray(files)) {
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i]
+        const meta = this.getFrontmatterObject(f)
+        const result = this.isApplicableValuesForKey(config, meta)
+        if (typeof result === 'boolean' && result) {
+          return true
         }
-      })
+      }
+      return false
     }
 
+    return undefined
+  }
+
+  getMarkdownFiles(fileObjects, label) {
+    let fileList = []
+    console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
+    for (const index in fileObjects) {
+      const file = fileObjects[index]
+      if (typeof file === 'object' && file.status && file.filename) {
+        fileList.push(file.filename)
+      }
+    }
+    const mdRegEx = /.\.md$/i
+    fileList = fileList.filter(p => mdRegEx.test(p))
+    fileList.forEach(f => console.log(`File "${f}" is taken into account`))
+    return fileList
+  }
+
+  getFrontmatterObject(filename) {
+    try {
+      const content = external_fs_default().readFileSync(filename, { encoding: 'utf8' })
+      return front_matter_default()(content).attributes
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  isApplicableValuesForKey(configValues, metaValues) {
+    if (Array.isArray(configValues) ) {
+      for (let i = 0; i < configValues.length; i++) {
+        if (metaValues.hasOwnProperty(configValues[i])) {
+          return true
+        }
+      }
+    } else if (typeof configValues === 'object') {
+      for (const key in configValues) {
+        if (configValues.hasOwnProperty(key)) {
+          const valuesForKey = configValues[key]
+          if (Array.isArray(valuesForKey)) {
+            for (let i = 0; i < valuesForKey.length; i++) {
+              const v = valuesForKey[i]
+              if (Array.isArray(metaValues[key])) {
+                if (metaValues[key].includes(v)) {
+                  return true
+                }
+              } else if (typeof metaValues[key] === 'string') {
+                if (metaValues[key] === v) {
+                  return true
+                }
+              }
+            }
+          } else if (typeof valuesForKey === 'string') {
+            if (Array.isArray(metaValues[key])) {
+              if (metaValues[key].includes(valuesForKey)) {
+                return true
+              }
+            } else if (typeof metaValues[key] === 'string') {
+              if (metaValues[key] === valuesForKey) {
+                return true
+              }
+            }
+          } else {
+            return false
+          }
+        }
+      }
+    } else if (typeof configValues === 'string') {
+      return metaValues.hasOwnProperty(configValues)
+    } else {
+      return false
+    }
+  }
+}
+
+;// CONCATENATED MODULE: ./src/labeler.js
+
+
+
+
+
+
+
+
+
+
+
+const DEFAULT_CONFIG_PATH = '.github/labeler.yml'
+const DEFAULT_STRATEGY = {
+  'append': true,
+  'replace': false,
+  'create-if-missing': false,
+  'only': false
+}
+
+class Labeler {
+  async run() {
+    try {
+      const configPath = core.getInput('config', { required: true })
+      const token = core.getInput('token', { required: true })
+      const commonStrategy = core.getInput('strategy', { required: false })
+
+      const file = external_fs_default().readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
+      const labelRules = yaml.parse(file)
+      console.log('Configuration:', labelRules)
+
+      const owner = this.getOwner()
+      const repo = this.getRepository()
+
+      const pullNumber = this.getPrNumber()
+      const pullObject = await this.getPullObject(owner, repo, pullNumber, token)
+      const fileObjects = await this.getFileObjects(owner, repo, pullNumber, token)
+      const assignee = this.getAssignee(pullObject)
+
+      const modules = this.setupModules(labelRules, { fileObjects: fileObjects.data, assignee })
+      const newLabels = this.prepareNewLabels(modules, labelRules)
+      const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
+      const allLabels = await this.getAllLabels(owner, repo, token)
+
+      const strategy = this.setupStrategy((!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY), labelRules)
+      const readyToPostLabels = await this.mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
+
+      await this.postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  getOwner() {
+    return github.context.repo.owner
+  }
+
+  getRepository() {
+    return github.context.repo.repo
+  }
+
+  getPrNumber() {
+    const pullRequest = github.context.payload.pull_request
+    if (!pullRequest) {
+      return undefined;
+    }
+    return pullRequest.number
+  }
+
+  async getPullObject(owner, repo, prNumber, ghKey) {
+    const octokit = new dist_node.Octokit({ auth: ghKey })
+    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+      owner,
+      repo,
+      pull_number: prNumber
+    })
+  }
+
+  async getFileObjects(owner, repo, prNumber, ghKey) {
+    const octokit = new dist_node.Octokit({ auth: ghKey })
+    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
+      owner,
+      repo,
+      pull_number: prNumber
+    })
+  }
+
+  async getOldLabels(owner, repo, prNumber, ghKey) {
+    const labels = new Set([])
+    const octokit = new dist_node.Octokit({ auth: ghKey })
     const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
       owner,
       repo,
-      issue_number: pullNumber,
+      issue_number: prNumber,
     })
     for (const key in oldLabelsObject) {
-      if (oldLabelsObject[key].hasOwnProperty('name') && !labels.has(oldLabelsObject[key].name)) {
+      if (oldLabelsObject[key].hasOwnProperty('name')) {
         labels.add(oldLabelsObject[key].name)
       }
     }
+    return labels
+  }
+
+  async getAllLabels(owner, repo, ghKey) {
+    const octokit = new dist_node.Octokit({ auth: ghKey })
+    const labelObjects = await octokit.request('GET /repos/{owner}/{repo}/labels', {
+      owner,
+      repo
+    })
+    const labels = new Set([])
+    if (Array.isArray(labelObjects)) {
+      labelObjects.forEach(lo => {
+        labels.add(lo.name)
+      })
+      return labels
+    }
+  }
+
+  async createLabel(owner, repo, ghKey, label) {
+    const octokit = new dist_node.Octokit({ auth: ghKey })
+    await octokit.request('POST /repos/{owner}/{repo}/labels', {
+      owner,
+      repo,
+      name: label
+    })
+  }
+
+  getAssignee(pullObject) {
+    return pullObject.assignees
+  }
+
+  setupModules(config, objects) {
+    const modules = []
+    const moduleNames = new Set([])
+
+    for (const label in config) {
+      if (Object.hasOwnProperty.call(config, label)) {
+        const setupObject = config[label]
+        for (const key in setupObject) {
+          if (Object.hasOwnProperty.call(setupObject, key)) {
+            moduleNames.add(key)
+          }
+        }
+      }
+    }
+    moduleNames.forEach(m => {
+      switch (m) {
+        case 'assignee':
+          modules.push(new AssigneeModule(objects.assignee, config))
+          break
+        case 'files':
+          modules.push(new FilesModule(objects.fileObjects, config))
+          break
+        case 'meta':
+          modules.push(new FrontmatterModule(objects.fileObjects, config))
+          break
+      }
+    })
+
+    return modules
+  }
+
+  setupStrategy(commonStrategy, config) {
+    let readyCommonStrategy = {}
+    if (typeof commonStrategy === 'string') {
+      readyCommonStrategy[commonStrategy] = true
+    } else if (Array.isArray(commonStrategy)) {
+      commonStrategy.forEach(s => readyCommonStrategy[s] = true)
+    } else {
+      readyCommonStrategy = commonStrategy
+    }
+    const resultedStrategy = {}
+    const labels = Object.keys(config)
+    labels.forEach(l => {
+      const labelConfig = config[l]
+      if (labelConfig.hasOwnProperty('strategy')) {
+        const strategies = labelConfig['strategy']
+        if (Array.isArray(strategies)) {
+          const o = {}
+          strategies.forEach(s => {
+            o[s] = true
+          })
+          resultedStrategy[l] = Object.assign(o, readyCommonStrategy)
+        } else if (typeof strategies === 'object') {
+          resultedStrategy[l] = Object.assign(strategies, readyCommonStrategy)
+        } else if (typeof strategies === 'string') {
+          const o = {}
+          o[strategies] = true
+          resultedStrategy[l] = Object.assign(o, readyCommonStrategy)
+        }
+      } else {
+        resultedStrategy[l] = readyCommonStrategy
+      }
+    })
+    return { common: readyCommonStrategy, local: resultedStrategy }
+  }
+
+  prepareNewLabels(modules, config) {
+    const newLabels = new Set([])
+    const labels = Object.keys(config)
+    labels.forEach(l => {
+      let result = false
+      modules.forEach(m => {
+        if (m instanceof BaseModule) {
+          const labelConfigArray = config[l]
+          if (Array.isArray(labelConfigArray)) {
+            labelConfigArray.forEach((_, i) => {
+              result = result || m.isApplicable(l, i)
+            })
+          } else if (typeof labelConfigArray === 'object') {
+            result = result || m.isApplicable(l)
+          }
+        }
+      })
+      if (result) newLabels.add(l)
+    })
+    return newLabels
+  }
+
+  async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
+    const labels = newLabels
+    let onlyLabel = ''
+    await newLabels.forEach(async l => {
+      if (strategy.local[l].hasOwnProperty('only') && strategy.local[l]['only']) {
+        onlyLabel = l
+      }
+      if (strategy.local[l].hasOwnProperty('create-if-missing') && strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
+        await this.createLabel(owner, repo, ghKey, l)
+      }
+    })
+    if (onlyLabel !== '') {
+      newLabels.forEach(l => {
+        if (l !== onlyLabel) {
+          labels.remove(l)
+        }
+      })
+    }
+    return labels
+  }
+
+  async mergeLabels(owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) {
+    const labels = await this.collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
+    console.log('New labels:')
+    labels.forEach(l => console.log('- ', l))
+    if (strategy.common.hasOwnProperty('append') && strategy.common.append) {
+      console.log('Old labels:')
+      oldLabels.forEach(l => {
+        labels.add(l)
+        console.log('- ', l)
+      })
+      return labels
+    } else if (strategy.common.hasOwnProperty('replace') && strategy.common.replace) {
+      return labels
+    }
+  }
+
+  async postNewLabels(owner, repo, prNumber, ghKey, newLabels) {
+    console.log('Labels for PR:')
+    newLabels.forEach(l => {
+      console.log('- ', l)
+    })
+    const octokit = new dist_node.Octokit({ auth: ghKey })
     await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       owner,
       repo,
-      issue_number: pullNumber,
-      labels: [...labels]
+      issue_number: prNumber,
+      labels: [...newLabels]
     })
-  } catch (error) {
-    core.error(error);
-    core.setFailed(error.message);
   }
-}
-
-const getPrNumber = () => {
-  const pullRequest = github.context.payload.pull_request;
-  if (!pullRequest) {
-    return undefined;
-  }
-
-  return pullRequest.number;
-}
-
-const selectLabels = (selectedFiles, selectedRules) => {
-  const output = new Set([])
-  for (const label in selectedRules) {
-    if (Object.hasOwnProperty.call(selectedRules, label)) {
-      const labelRules = selectedRules[label]
-      for (const status in labelRules) {
-        const statusRules = labelRules[status]
-        statusRules.forEach(filePattern => {
-          if (Object.keys(selectedFiles).includes(status)) {
-            const regExp = new RegExp(filePattern, 'i')
-            selectedFiles[status].forEach(fileName => {
-              const isValid = regExp.test(fileName)
-              const isNotInList = !output.has(label)
-              if (isValid && isNotInList) {
-                output.add(label)
-              }
-            })
-          }
-        })
-      }
-    }
-  }
-  return output
 }
 
 ;// CONCATENATED MODULE: ./src/main.js
 
 
-run()
+const l = new Labeler()
+l.run()
 
 })();
 

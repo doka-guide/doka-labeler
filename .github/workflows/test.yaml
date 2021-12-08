@@ -1,0 +1,34 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install node modules
+        run: npm ci
+      - name: Run unit tests
+        run: npm run test
+  build-check:
+    name: Check build
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install node modules
+        run: npm ci
+      - name: Build a project
+        run: npm run build
