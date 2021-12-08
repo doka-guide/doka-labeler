@@ -256,7 +256,7 @@ export class Labeler {
   }
 
   async postNewLabels(owner, repo, prNumber, ghKey, newLabels) {
-    console.log('Set of labels:')
+    console.log('Labels for PR:')
     newLabels.forEach(l => {
       console.log(l)
     })
