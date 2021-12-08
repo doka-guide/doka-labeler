@@ -8,7 +8,6 @@ import { BaseModule } from './modules/base.js'
 import { AssigneeModule } from './modules/assignee.js'
 import { FilesModule } from './modules/files.js'
 import { FrontmatterModule } from './modules/frontmatter.js'
-import { Context } from '@actions/github/lib/context'
 
 const DEFAULT_CONFIG_PATH = '.github/labeler.yml'
 const DEFAULT_STRATEGY = {

@@ -21774,10 +21774,7 @@ class FrontmatterModule extends BaseModule {
   }
 }
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/context.js
-var context = __nccwpck_require__(4087);
 ;// CONCATENATED MODULE: ./src/labeler.js
-
 
 
 
