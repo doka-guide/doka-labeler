@@ -27,30 +27,46 @@ export class Labeler {
       const file = fs.readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml.parse(file)
 
-      const owner = 'doka-guide'
-      const repo = 'content'
+      const owner = this.getOwner()
+      const repo = this.getRepository()
 
-      const pullNumber = getPrNumber()
-      const pullObject = await getPullObject(owner, repo, pullNumber, token)
-      const fileObjects = await getFileObjects(owner, repo, pullNumber, token)
-      const assignee = getAssignee(pullObject)
+      const pullNumber = this.getPrNumber()
+      const pullObject = await this.getPullObject(owner, repo, pullNumber, token)
+      const fileObjects = await this.getFileObjects(owner, repo, pullNumber, token)
+      const assignee = this.getAssignee(pullObject)
 
-      const modules = setupModules(labelRules, { fileObjects, assignee })
-      const newLabels = prepareNewLabels(modules)
-      const oldLabels = await getOldLabels(owner, repo, pullNumber, token)
-      const allLabels = await getAllLabels(owner, repo, token)
+      const modules = this.setupModules(labelRules, { fileObjects, assignee })
+      const newLabels = this.prepareNewLabels(modules)
+      const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
+      const allLabels = await this.getAllLabels(owner, repo, token)
 
-      const strategy = setupStrategy(!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
-      const readyToPostLabels = await mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
+      const strategy = this.setupStrategy(!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
+      const readyToPostLabels = await this.mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
 
-      await postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
+      await this.postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
     } catch (e) {
       console.log(e)
     }
   }
 
+  getOwner() {
+    const owner = github.context.owner
+    if (!owner) {
+      return undefined
+    }
+    return owner
+  }
+
+  getRepository() {
+    const repo = github.context.repo
+    if (!repo) {
+      return undefined
+    }
+    return repo
+  }
+
   getPrNumber() {
-    const pullRequest = github.context.payload.pull_request;
+    const pullRequest = github.context.payload.pull_request
     if (!pullRequest) {
       return undefined;
     }
