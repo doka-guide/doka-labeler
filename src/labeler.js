@@ -9,6 +9,7 @@ import { AssigneeModule } from './modules/assignee.js'
 import { FilesModule } from './modules/files.js'
 import { FrontmatterModule } from './modules/frontmatter.js'
 
+const DEFAULT_CONFIG_PATH = '.github/labeler.yml'
 const DEFAULT_STRATEGY = {
   'append': true,
   'replace': false,
@@ -23,7 +24,7 @@ export class Labeler {
       const token = core.getInput('token', { required: true })
       const commonStrategy = core.getInput('strategy', { required: false })
 
-      const file = fs.readFileSync(configPath, 'utf8')
+      const file = fs.readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml.parse(file)
 
       const owner = 'doka-guide'
