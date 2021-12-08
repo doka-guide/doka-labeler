@@ -8,6 +8,7 @@ import { BaseModule } from './modules/base.js'
 import { AssigneeModule } from './modules/assignee.js'
 import { FilesModule } from './modules/files.js'
 import { FrontmatterModule } from './modules/frontmatter.js'
+import { Context } from '@actions/github/lib/context'
 
 const DEFAULT_CONFIG_PATH = '.github/labeler.yml'
 const DEFAULT_STRATEGY = {
@@ -50,19 +51,11 @@ export class Labeler {
   }
 
   getOwner() {
-    const owner = github.context.owner
-    if (!owner) {
-      return undefined
-    }
-    return owner
+    return github.context.repo.owner
   }
 
   getRepository() {
-    const repo = github.context.repo
-    if (!repo) {
-      return undefined
-    }
-    return repo
+    return github.context.repo.repo
   }
 
   getPrNumber() {
