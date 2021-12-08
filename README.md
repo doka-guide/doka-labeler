@@ -29,11 +29,50 @@ Set "design review" label if PR contains a new HTML file in the _src_ folder:
 
 ## Getting Started
 
+### Create Workflow
+
+Create a workflow (eg: .github/workflows/labeler.yml see [Creating a Workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) to apply the labeler for the repository:
+
+```yaml
+name: Labeler
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  labeling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run labeler
+        uses: doka-guide/action-labeler@v1
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          config: ".github/labeler.yml"
+```
+
+_Note: This grants access to the GITHUB_TOKEN so the action can make calls to GitHub's rest API_
+
+Inputs are defined in `[action.yml](https://github.com/doka-guide/action-labeler/blob/main/action.yml)` to configure the labeler:
+
+| Name | Description | Default |
+| - | - | - |
+| `token` | Token to use to authorize label changes. Typically the GITHUB_TOKEN secret | N/A |
+| `config` | The path to the label configuration file | `.github/labeler.yml` |
+| `strategy` | The global strategy for labels | `'append'` |
+
+### Create labeler config
 Create `.github/labeler.yml` with a list of labels and conditions for applying them.
 
 The key is the name of the label in your repository (e.g., "refactor" or "design review needed"). The value is a set of conditions described below. The action adds a label only when _all conditions match_ (logical AND).
 
-### PR contains certain `files`
+#### PR contains certain `files`
 
 Use the `files` condition to label a PR that contains files matching a glob
 
@@ -69,7 +108,7 @@ dependencies:
     added: lib/**/*
 ```
 
-### PR has a certain `assignee`
+#### PR has a certain `assignee`
 
 Use the `assignee` condition to label PR, which was assigned to a certain user.
 If several usernames are listed, any of them can be assigned to fulfill the condition.
@@ -83,7 +122,7 @@ blocked:
     - igsekor
 ```
 
-### PR matches `meta` data from your markdown files
+#### PR matches `meta` data from your markdown files
 
 Use the `meta` condition to label PR, which has certain values from your Markdown metadata (aka front matter).
 
@@ -141,43 +180,3 @@ invalid:
   - files:
       removed: package-lock.json
 ```
-
-## Create Workflow
-
-Create a workflow (eg: .github/workflows/labeler.yml see [Creating a Workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) to apply the labeler for the repository:
-
-```yaml
-name: Labeler
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  labeling:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run labeler
-        uses: doka-guide/action-labeler@v1
-        with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          config: ".github/labeler.yml"
-```
-
-_Note: This grants access to the GITHUB_TOKEN so the action can make calls to GitHub's rest API_
-
-### Inputs
-
-Inputs are defined in `[action.yml](https://github.com/doka-guide/action-labeler/blob/main/action.yml)` to configure the labeler:
-
-| Name | Description | Default |
-| - | - | - |
-| `token` | Token to use to authorize label changes. Typically the GITHUB_TOKEN secret | N/A |
-| `config` | The path to the label configuration file | `.github/labeler.yml` |
-| `strategy` | The global strategy for labels | `'append'`
