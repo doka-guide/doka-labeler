@@ -1,6 +1,7 @@
 name: 'Doka Labeler'
 description: 'Automatically label new pull requests based on the paths of files being changed'
 author: 'Doka'
+
 inputs:
   token:
     description: 'The GITHUB_TOKEN secret'
@@ -9,6 +10,10 @@ inputs:
     description: 'The path for the label configurations'
     default: '.github/labeler.yml'
     required: true
+
+branding:
+  icon: 'tag'
+  color: 'gray-dark'
 
 runs:
   using: 'node12'
