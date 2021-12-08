@@ -1,0 +1,31 @@
+# "scope:auth" label when markdown files in auth module directory are changed
+"scope:auth":
+  - files: src/modules/auth/**/*.(js|jsx)
+
+"scope:cookies":
+  - files: src/modules/cookies/**/*.(js|jsx)
+
+
+# "internal" label when workflow is touched
+internal:
+  - files: ".github/**"
+
+# "improvements" label when non-code things are changed
+improvements:
+  - files:
+      - README.md
+      - LICENSE
+      - docs/**
+      - pages/**
+
+# mark when project critical files are removed
+"🚨 alarm":
+  - strategy:
+      - create-if-missing # create this label if it does not exist
+  - files:
+      modified:
+        - package-lock.json
+      removed:
+        - package-lock.json
+        - package.json
+        - .github/**
