@@ -218,10 +218,12 @@ export class Labeler {
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
     const labels = new Set([])
+    console.log('collectNewLabels - newLabels:', newLabels)
     let onlyLabel = ''
     for (let i = 0; i < newLabels.length; i++) {
       const l = newLabels[i]
       labels.add(l)
+      console.log('collectNewLabels - labels:', newLabels)
       if (strategy.local[l]['only']) {
         onlyLabel = l
         break
