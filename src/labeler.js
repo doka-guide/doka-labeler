@@ -219,10 +219,10 @@ export class Labeler {
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
     const labels = newLabels
     await newLabels.forEach(async l => {
-      if (strategy.local[l]['only']) {
+      if (strategy.local[l].hasOwnProperty('only') && strategy.local[l]['only']) {
         onlyLabel = l
       }
-      if (strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
+      if (strategy.local[l].hasOwnProperty('create-if-missing') && strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
         await this.createLabel(owner, repo, ghKey, l)
       }
     })
@@ -240,14 +240,14 @@ export class Labeler {
     const labels = await this.collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
     console.log('New labels:')
     labels.forEach(l => console.log('- ', l))
-    if (strategy.common.append) {
+    if (strategy.common.hasOwnProperty('append') && strategy.common.append) {
       console.log('Old labels:')
       oldLabels.forEach(l => {
         labels.add(l)
         console.log('- ', l)
       })
       return labels
-    } else if (strategy.common.replace) {
+    } else if (strategy.common.hasOwnProperty('replace') && strategy.common.replace) {
       return labels
     }
   }
