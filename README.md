@@ -141,3 +141,43 @@ invalid:
   - files:
       removed: package-lock.json
 ```
+
+## Create Workflow
+
+Create a workflow (eg: .github/workflows/labeler.yml see [Creating a Workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) to apply the labeler for the repository:
+
+```yaml
+name: Labeler
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  labeling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run labeler
+        uses: doka-guide/action-labeler@v1
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          config: ".github/labeler.yml"
+```
+
+_Note: This grants access to the GITHUB_TOKEN so the action can make calls to GitHub's rest API_
+
+### Inputs
+
+Inputs are defined in `[action.yml](https://github.com/doka-guide/action-labeler/blob/main/action.yml)` to configure the labeler:
+
+| Name | Description | Default |
+| - | - | - |
+| `token` | Token to use to authorize label changes. Typically the GITHUB_TOKEN secret | N/A |
+| `config` | The path to the label configuration file | `.github/labeler.yml` |
+| `strategy` | The global strategy for labels | `'append'`
