@@ -22007,7 +22007,7 @@ class Labeler {
         await this.createLabel(owner, repo, ghKey, l)
       }
     }
-    if (!!onlyLabel) {
+    if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {
           labels.remove(l)
