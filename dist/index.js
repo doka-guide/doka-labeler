@@ -21574,12 +21574,12 @@ var picomatch_default = /*#__PURE__*/__nccwpck_require__.n(picomatch);
 
 
 
-const FILE_STATUSES = (/* unused pure expression or super */ null && ([
+const FILE_STATUSES = [
   'added',
   'modified',
   'removed',
   'renamed'
-]))
+]
 
 class FilesModule extends BaseModule {
   MODULE_KEY = 'files'
@@ -21615,14 +21615,31 @@ class FilesModule extends BaseModule {
       return this.areFilesApplicable(fileObjects, label, [config])
     } else if (Array.isArray(config)) {
       return this.areFilesApplicable(fileObjects, label, [...config])
+    } else if (typeof config === 'object') {
+      FILE_STATUSES.forEach(s => {
+        if (config.hasOwnProperty(s)) {
+          if (typeof config[s] === 'string') {
+            const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+            if (result) {
+              return result
+            }
+          } else if (Array.isArray(config[s])) {
+            const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+            if (result) {
+              return result
+            }
+          }
+        }
+      })
+
     } else {
       return undefined
     }
   }
 
-  areFilesApplicable(fileObjects, label, patterns) {
+  areFilesApplicable(fileObjects, label, patterns, status = null) {
     if (Array.isArray(patterns)) {
-      let fileList = this.getArrayFromGitHubFiles(fileObjects)
+      let fileList = this.getArrayFromGitHubFiles(fileObjects, status || null)
       if (Array.isArray(fileList) && fileList.length > 0) {
         console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
       } else {
@@ -21643,12 +21660,18 @@ class FilesModule extends BaseModule {
     return false
   }
 
-  getArrayFromGitHubFiles(fileObjects) {
+  getArrayFromGitHubFiles(fileObjects, status = null) {
     const fileList = []
     for (const i in fileObjects) {
       const file = fileObjects[i]
-      if (typeof file === 'object' && file.status && file.filename) {
-        fileList.push(file.filename)
+      if (status !== null) {
+        if (typeof file === 'object' && file.status === status && file.filename) {
+          fileList.push(file.filename)
+        }
+      } else {
+        if (typeof file === 'object' && file.status && file.filename) {
+          fileList.push(file.filename)
+        }
       }
     }
     return fileList
