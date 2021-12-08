@@ -218,6 +218,7 @@ export class Labeler {
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
     const labels = newLabels
+    let onlyLabel = ''
     await newLabels.forEach(async l => {
       if (strategy.local[l].hasOwnProperty('only') && strategy.local[l]['only']) {
         onlyLabel = l
