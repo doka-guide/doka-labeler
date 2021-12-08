@@ -40,7 +40,7 @@ export class Labeler {
       const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
       const allLabels = await this.getAllLabels(owner, repo, token)
 
-      const strategy = this.setupStrategy(!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY, labelRules)
+      const strategy = this.setupStrategy((!!commonStrategy ? commonStrategy : DEFAULT_STRATEGY), labelRules)
       const readyToPostLabels = await this.mergeLabels(owner, repo, token, allLabels, oldLabels, newLabels, strategy)
 
       await this.postNewLabels(owner, repo, pullNumber, token, readyToPostLabels)
