@@ -252,6 +252,10 @@ export class Labeler {
   }
 
   async postNewLabels(owner, repo, prNumber, ghKey, newLabels) {
+    console.log('Set of labels:')
+    newLabels.forEach(l => {
+      console.log(l)
+    })
     const octokit = new Octokit({ auth: ghKey })
     await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       owner,
