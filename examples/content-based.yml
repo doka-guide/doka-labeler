@@ -1,0 +1,43 @@
+# "css" label when markdown files in css directory are changed
+css:
+  - files: css/**/*.md
+
+# "html" label when markdown files in css directory are changed
+html:
+  - files: html/**/*.md
+
+# "internal" label when workflow is touched
+internal:
+  - files: ".github/**"
+
+# "improvements" label when non-code things are changed
+improvements:
+  - files:
+      - README.md
+      - LICENSE
+      - docs/**
+      - pages/**
+
+# mark when project critical files are removed
+"🚨 alarm":
+  - files:
+      modified:
+        - package-lock.json
+      removed:
+        - package-lock.json
+        - package.json
+        - .github/**
+
+# "demo" when PR is assigned to nlopin and there are changes in "demos" folders
+demo:
+  - assignee: nlopin
+  - files:
+      - "css\/*/demos\/.+\/.+.html"
+      - "html\/*/demos\/.+\/.+.html"
+      - "js\/*/demos\/.+\/.+.html"
+      - "tools\/*/demos\/.+\/.+.html"
+
+# "article" when front matter has the matching tag
+article:
+  - meta:
+      tags: article
