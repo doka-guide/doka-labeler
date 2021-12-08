@@ -22017,10 +22017,14 @@ class Labeler {
   }
 
   async mergeLabels(owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) {
+    console.log('New labels:')
+    newLabels.forEach(l => console.log(l))
     const labels = await this.collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
     if (strategy.common.append) {
+      console.log('Old labels:')
       oldLabels.forEach(l => {
         labels.add(l)
+        console.log(l)
       })
       return labels
     } else if (strategy.common.replace) {
