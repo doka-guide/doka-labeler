@@ -21774,7 +21774,10 @@ class FrontmatterModule extends BaseModule {
   }
 }
 
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/context.js
+var context = __nccwpck_require__(4087);
 ;// CONCATENATED MODULE: ./src/labeler.js
+
 
 
 
@@ -21827,19 +21830,11 @@ class Labeler {
   }
 
   getOwner() {
-    const owner = github.context.owner
-    if (!owner) {
-      return undefined
-    }
-    return owner
+    return github.context.repo.owner
   }
 
   getRepository() {
-    const repo = github.context.repo
-    if (!repo) {
-      return undefined
-    }
-    return repo
+    return github.context.repo.repo
   }
 
   getPrNumber() {
