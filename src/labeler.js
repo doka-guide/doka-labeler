@@ -34,11 +34,9 @@ export class Labeler {
       const pullNumber = this.getPrNumber()
       const pullObject = await this.getPullObject(owner, repo, pullNumber, token)
       const fileObjects = await this.getFileObjects(owner, repo, pullNumber, token)
-      console.log('Files:', fileObjects)
       const assignee = this.getAssignee(pullObject)
-      console.log('Assignee:', assignee)
 
-      const modules = this.setupModules(labelRules, { fileObjects, assignee })
+      const modules = this.setupModules(labelRules, { fileObjects: fileObjects.data, assignee })
       const newLabels = this.prepareNewLabels(modules, labelRules)
       const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
       const allLabels = await this.getAllLabels(owner, repo, token)
