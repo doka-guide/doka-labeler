@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="img/logo.png" width="230" height="80" alt="Dog in glasses" />
+  <img src="/img/logo.png" width="230" height="80" alt="Dog in glasses" />
   <h1>Doka Labeler</h1>
 </div>
 
@@ -65,7 +65,7 @@ Inputs are defined in `[action.yml](https://github.com/doka-guide/doka-labeler/b
 | - | - | - |
 | `token` | Token to use to authorize label changes. Typically the GITHUB_TOKEN secret | N/A |
 | `config` | The path to the label configuration file | `.github/labeler.yml` |
-| `strategy` | The global strategy for labels | `'append'` |
+| `strategy` | [The global strategy for labels](#label-strategies) | `'append'` |
 
 
 ### Create labeler config
