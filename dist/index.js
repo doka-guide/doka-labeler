@@ -22025,7 +22025,7 @@ class Labeler {
       oldLabels.forEach(l => {
         labels.add(l)
       })
-      return l
+      return labels
     } else if (strategy.common.replace) {
       return labels
     }
@@ -22045,8 +22045,8 @@ class Labeler {
 ;// CONCATENATED MODULE: ./src/main.js
 
 
-const main_l = new Labeler()
-main_l.run()
+const l = new Labeler()
+l.run()
 
 })();
 

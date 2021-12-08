@@ -246,7 +246,7 @@ export class Labeler {
       oldLabels.forEach(l => {
         labels.add(l)
       })
-      return l
+      return labels
     } else if (strategy.common.replace) {
       return labels
     }
