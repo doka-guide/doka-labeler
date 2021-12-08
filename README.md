@@ -3,6 +3,8 @@
   <h1>Doka Labeler</h1>
 </div>
 
+[![Testing](https://github.com/doka-guide/action-labeler/actions/workflows/test.yaml/badge.svg)](https://github.com/doka-guide/action-labeler/actions/workflows/test.yaml)
+
 Automatically label pull requests based on multiple criteria with minimal configuration:
 * files added, deleted, renamed, or modified
 * assignees
