@@ -4,7 +4,7 @@
   "license": "MIT",
   "version": "1.0.0",
   "description": "An action for automatically labelling pull requests",
-  "main": "index.js",
+  "main": "src/main.js",
   "type": "module",
   "scripts": {
     "build": "ncc build src/main.js -o dist",
