@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/img/logo.png" width="230" height="80" alt="Dog in glasses" />
+  <img src="https://github.com/doka-guide/doka-labeler/blob/main/img/logo.png" width="230" height="80" alt="Dog in glasses" />
   <h1>Doka Labeler</h1>
 </div>
 
