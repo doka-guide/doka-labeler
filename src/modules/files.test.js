@@ -22,16 +22,8 @@ test('FilesModule contains fields object, config', t => {
 test('FilesModule method parse files correctly', t => {
   const objects = [
     {
-      "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
       "filename": "file1.txt",
-      "status": "added",
-      "additions": 103,
-      "deletions": 21,
-      "changes": 124,
-      "blob_url": "https://github.com/octocat/Hello-World/blob/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "raw_url": "https://github.com/octocat/Hello-World/raw/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/file1.txt?ref=6dcb09b5b57875f334f61aebed695e2e4193db5e",
-      "patch": "@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@ module Test"
+      "status": "added"
     }
   ]
   const config = {
@@ -51,16 +43,8 @@ test('FilesModule method parse files correctly', t => {
 test('FilesModule method isApplicable returns correct values for string', t => {
   const objects = [
     {
-      "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
       "filename": "file1.txt",
-      "status": "added",
-      "additions": 103,
-      "deletions": 21,
-      "changes": 124,
-      "blob_url": "https://github.com/octocat/Hello-World/blob/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "raw_url": "https://github.com/octocat/Hello-World/raw/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/file1.txt?ref=6dcb09b5b57875f334f61aebed695e2e4193db5e",
-      "patch": "@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@ module Test"
+      "status": "added"
     }
   ]
   const config = {
@@ -82,16 +66,8 @@ test('FilesModule method isApplicable returns correct values for string', t => {
 test('FilesModule method isApplicable returns correct values for array', t => {
   const objects = [
     {
-      "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
       "filename": "file1.txt",
-      "status": "added",
-      "additions": 103,
-      "deletions": 21,
-      "changes": 124,
-      "blob_url": "https://github.com/octocat/Hello-World/blob/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "raw_url": "https://github.com/octocat/Hello-World/raw/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/file1.txt?ref=6dcb09b5b57875f334f61aebed695e2e4193db5e",
-      "patch": "@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@ module Test"
+      "status": "added"
     }
   ]
   const config = {
@@ -119,16 +95,8 @@ test('FilesModule method isApplicable returns correct values for array', t => {
 test('FilesModule method isApplicable returns correct values for mix values in array case', t => {
   const objects = [
     {
-      "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
       "filename": "file1.txt",
-      "status": "added",
-      "additions": 103,
-      "deletions": 21,
-      "changes": 124,
-      "blob_url": "https://github.com/octocat/Hello-World/blob/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "raw_url": "https://github.com/octocat/Hello-World/raw/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
-      "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/file1.txt?ref=6dcb09b5b57875f334f61aebed695e2e4193db5e",
-      "patch": "@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@ module Test"
+      "status": "added"
     }
   ]
   const config = {

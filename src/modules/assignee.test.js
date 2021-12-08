@@ -21,44 +21,10 @@ test('AssigneeModule contains fields object, config', t => {
 test('AssignModule parse assignee correctly', t => {
   const objects = [
     {
-      "login": "user1",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/octocat",
-      "html_url": "https://github.com/octocat",
-      "followers_url": "https://api.github.com/users/octocat/followers",
-      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
-      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-      "organizations_url": "https://api.github.com/users/octocat/orgs",
-      "repos_url": "https://api.github.com/users/octocat/repos",
-      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/octocat/received_events",
-      "type": "User",
-      "site_admin": false
+      "login": "user1"
     },
     {
-      "login": "user2",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/hubot_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/hubot",
-      "html_url": "https://github.com/hubot",
-      "followers_url": "https://api.github.com/users/hubot/followers",
-      "following_url": "https://api.github.com/users/hubot/following{/other_user}",
-      "gists_url": "https://api.github.com/users/hubot/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/hubot/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/hubot/subscriptions",
-      "organizations_url": "https://api.github.com/users/hubot/orgs",
-      "repos_url": "https://api.github.com/users/hubot/repos",
-      "events_url": "https://api.github.com/users/hubot/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/hubot/received_events",
-      "type": "User",
-      "site_admin": true
+      "login": "user2"
     }
   ]
   const config = {
@@ -78,44 +44,10 @@ test('AssignModule parse assignee correctly', t => {
 test('AssigneeModule method isApplicable returns correct values for string', t => {
   const objects = [
     {
-      "login": "user1",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/octocat",
-      "html_url": "https://github.com/octocat",
-      "followers_url": "https://api.github.com/users/octocat/followers",
-      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
-      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-      "organizations_url": "https://api.github.com/users/octocat/orgs",
-      "repos_url": "https://api.github.com/users/octocat/repos",
-      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/octocat/received_events",
-      "type": "User",
-      "site_admin": false
+      "login": "user1"
     },
     {
-      "login": "user2",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/hubot_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/hubot",
-      "html_url": "https://github.com/hubot",
-      "followers_url": "https://api.github.com/users/hubot/followers",
-      "following_url": "https://api.github.com/users/hubot/following{/other_user}",
-      "gists_url": "https://api.github.com/users/hubot/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/hubot/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/hubot/subscriptions",
-      "organizations_url": "https://api.github.com/users/hubot/orgs",
-      "repos_url": "https://api.github.com/users/hubot/repos",
-      "events_url": "https://api.github.com/users/hubot/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/hubot/received_events",
-      "type": "User",
-      "site_admin": true
+      "login": "user2"
     }
   ]
   const config1 = {
@@ -137,44 +69,10 @@ test('AssigneeModule method isApplicable returns correct values for string', t =
 test('AssigneeModule method isApplicable returns correct values for array', t => {
   const objects = [
     {
-      "login": "user1",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/octocat",
-      "html_url": "https://github.com/octocat",
-      "followers_url": "https://api.github.com/users/octocat/followers",
-      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
-      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-      "organizations_url": "https://api.github.com/users/octocat/orgs",
-      "repos_url": "https://api.github.com/users/octocat/repos",
-      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/octocat/received_events",
-      "type": "User",
-      "site_admin": false
+      "login": "user1"
     },
     {
-      "login": "user2",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/hubot_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/hubot",
-      "html_url": "https://github.com/hubot",
-      "followers_url": "https://api.github.com/users/hubot/followers",
-      "following_url": "https://api.github.com/users/hubot/following{/other_user}",
-      "gists_url": "https://api.github.com/users/hubot/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/hubot/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/hubot/subscriptions",
-      "organizations_url": "https://api.github.com/users/hubot/orgs",
-      "repos_url": "https://api.github.com/users/hubot/repos",
-      "events_url": "https://api.github.com/users/hubot/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/hubot/received_events",
-      "type": "User",
-      "site_admin": true
+      "login": "user2"
     }
   ]
   const config2 = {
@@ -207,44 +105,10 @@ test('AssigneeModule method isApplicable returns correct values for array', t =>
 test('AssigneeModule method isApplicable returns correct values for mix values in array case', t => {
   const objects = [
     {
-      "login": "user1",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/octocat",
-      "html_url": "https://github.com/octocat",
-      "followers_url": "https://api.github.com/users/octocat/followers",
-      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
-      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-      "organizations_url": "https://api.github.com/users/octocat/orgs",
-      "repos_url": "https://api.github.com/users/octocat/repos",
-      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/octocat/received_events",
-      "type": "User",
-      "site_admin": false
+      "login": "user1"
     },
     {
-      "login": "user2",
-      "id": 1,
-      "node_id": "MDQ6VXNlcjE=",
-      "avatar_url": "https://github.com/images/error/hubot_happy.gif",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/hubot",
-      "html_url": "https://github.com/hubot",
-      "followers_url": "https://api.github.com/users/hubot/followers",
-      "following_url": "https://api.github.com/users/hubot/following{/other_user}",
-      "gists_url": "https://api.github.com/users/hubot/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/hubot/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/hubot/subscriptions",
-      "organizations_url": "https://api.github.com/users/hubot/orgs",
-      "repos_url": "https://api.github.com/users/hubot/repos",
-      "events_url": "https://api.github.com/users/hubot/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/hubot/received_events",
-      "type": "User",
-      "site_admin": true
+      "login": "user2"
     }
   ]
   const config3 = {
