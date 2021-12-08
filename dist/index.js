@@ -21890,8 +21890,8 @@ class Labeler {
       labelObjects.forEach(lo => {
         labels.add(lo.name)
       })
+      return labels
     }
-    return labels
   }
 
   async createLabel(owner, repo, ghKey, label) {
@@ -22006,7 +22006,7 @@ class Labeler {
         break
       }
       if (strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
-        await createLabel(owner, repo, ghKey, l)
+        await this.createLabel(owner, repo, ghKey, l)
       }
     }
     if (!!onlyLabel) {
@@ -22020,7 +22020,7 @@ class Labeler {
   }
 
   async mergeLabels(owner, repo, ghKey, allLabels, oldLabels, newLabels, strategy) {
-    const labels = await collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
+    const labels = await this.collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy)
     if (strategy.common.append) {
       oldLabels.forEach(l => {
         labels.add(l)
