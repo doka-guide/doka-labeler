@@ -21886,10 +21886,11 @@ class Labeler {
       repo
     })
     const labels = new Set([])
-    const objectSet = new Set([...labelObjects])
-    objectSet.forEach(lo => {
-      labels.add(lo.name)
-    })
+    if (Array.isArray(labelObjects)) {
+      labelObjects.forEach(lo => {
+        labels.add(lo.name)
+      })
+    }
     return labels
   }
 
