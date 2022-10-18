@@ -133,6 +133,9 @@ test('FilesModule method isApplicable returns correct values for mix values in a
     },
     label4: {
       files: 'file2.txt'
+    },
+    label5: {
+      files: '*'
     }
   }
 
@@ -143,4 +146,39 @@ test('FilesModule method isApplicable returns correct values for mix values in a
   t.is(module.isApplicable('label2'), true)
   t.is(module.isApplicable('label3'), false)
   t.is(module.isApplicable('label4'), false)
+  t.is(module.isApplicable('label5'), true)
+})
+
+test('Folders are considered correctly with globs in the configurations', t => {
+  const objects = [
+    {
+      'filename': 'html/file1.txt',
+      'status': 'added'
+    },
+    {
+      'filename': 'js/article/file1.txt',
+      'status': 'modified'
+    }
+  ]
+  const config = {
+    html: {
+      files: 'html/**/*'
+    },
+    any: {
+      files: '**/*'
+    },
+    js: {
+      files: 'js/**/*.txt'
+    },
+    css: {
+      files: 'css/**/*'
+    }
+  }
+
+  const module = new FilesModule(objects, config)
+
+  t.is(module.isApplicable('html'), true)
+  t.is(module.isApplicable('js'), true)
+  t.is(module.isApplicable('any'), true)
+  t.is(module.isApplicable('css'), false)
 })
