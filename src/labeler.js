@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/core'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as yaml from 'yaml'
+import yaml from 'yaml'
 import fs from 'fs'
 
 import { BaseModule } from './modules/base.js'
@@ -36,7 +36,7 @@ export class Labeler {
       const fileObjects = await this.getFileObjects(owner, repo, pullNumber, token)
       const assignee = this.getAssignee(pullObject)
 
-      const modules = this.setupModules(labelRules, { fileObjects: fileObjects.data, assignee })
+      const modules = this.setupModules(labelRules, { fileObjects, assignee })
       const newLabels = this.prepareNewLabels(modules, labelRules)
       const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
       const allLabels = await this.getAllLabels(owner, repo, token)
@@ -68,41 +68,43 @@ export class Labeler {
 
   async getPullObject(owner, repo, prNumber, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+    const response = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
       owner,
       repo,
       pull_number: prNumber
     })
+
+    return response.data
   }
 
   async getFileObjects(owner, repo, prNumber, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
+    const response = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
       owner,
       repo,
       pull_number: prNumber
     })
+
+    return response.data
   }
 
   async getOldLabels(owner, repo, prNumber, ghKey) {
     const labels = new Set([])
     const octokit = new Octokit({ auth: ghKey })
-    const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+    const { data: oldLabels } = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
       owner,
       repo,
       issue_number: prNumber,
     })
-    for (const key in oldLabelsObject) {
-      if (oldLabelsObject[key].hasOwnProperty('name')) {
-        labels.add(oldLabelsObject[key].name)
-      }
+    for (const label of oldLabels) {
+      if (label.hasOwnProperty('name')) labels.add(label.name)
     }
     return labels
   }
 
   async getAllLabels(owner, repo, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    const labelObjects = await octokit.request('GET /repos/{owner}/{repo}/labels', {
+    const { data: labelObjects } = await octokit.request('GET /repos/{owner}/{repo}/labels', {
       owner,
       repo
     })
@@ -195,6 +197,7 @@ export class Labeler {
   }
 
   prepareNewLabels(modules, config) {
+    console.log('config', JSON.stringify(config, null, ''))
     const newLabels = new Set([])
     const labels = Object.keys(config)
     labels.forEach(l => {
@@ -211,6 +214,7 @@ export class Labeler {
           }
         }
       })
+      console.log(`Label ${l} match result: ${result ? 'match' : 'no match'}`)
       if (result) newLabels.add(l)
     })
     return newLabels
