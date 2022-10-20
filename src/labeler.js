@@ -27,8 +27,8 @@ export class Labeler {
       const file = fs.readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml.parse(file)
 
-      core.startGroup('Configuration:')
-      core.info(labelRules)
+      core.startGroup('Configuration')
+      core.info(JSON.stringify(labelRules, null, '  '))
       core.endGroup()
 
       const owner = this.getOwner()

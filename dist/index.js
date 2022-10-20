@@ -21831,8 +21831,8 @@ class Labeler {
       const file = external_fs_default().readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml_default().parse(file)
 
-      core.startGroup('Configuration:')
-      core.info(labelRules)
+      core.startGroup('Configuration')
+      core.info(JSON.stringify(labelRules, null, '  '))
       core.endGroup()
 
       const owner = this.getOwner()
