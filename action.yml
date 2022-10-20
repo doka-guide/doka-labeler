@@ -10,6 +10,10 @@ inputs:
     description: 'The path for the label configurations'
     default: '.github/labeler.yml'
     required: true
+  strategy:
+    description: 'How to apply matched labels: "append" - to add matched labels on top of already assigned; "replace" - replace currently assigned labels with new.'
+    default: 'append'
+    required: false
 
 branding:
   icon: 'tag'
