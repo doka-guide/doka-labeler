@@ -66,7 +66,7 @@ test('FrontmatterModule prepares files and meta correctly', t => {
   const module = new FrontmatterModule(objects, config)
 
   t.deepEqual(module.getMarkdownFiles(objects, 'test'), [mdFilePath])
-  t.deepEqual(module.getFrontmatterObject(mdFilePath), mdMeta)
+  t.deepEqual(module.getFrontmatterMeta(mdFilePath), mdMeta)
   t.is(module.isApplicableValuesForKey(config['label2'].meta, mdMeta), true)
 })
 

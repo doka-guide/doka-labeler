@@ -26,7 +26,10 @@ export class Labeler {
 
       const file = fs.readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml.parse(file)
-      console.log('Configuration:', labelRules)
+
+      core.startGroup('Configuration:')
+      core.info(labelRules)
+      core.endGroup()
 
       const owner = this.getOwner()
       const repo = this.getRepository()
@@ -131,7 +134,7 @@ export class Labeler {
   }
 
   setupModules(config, objects) {
-    core.startGroup('Initializing modules')
+    core.startGroup('Modules initialization')
 
     const modules = []
     const moduleNames = new Set([])
@@ -203,9 +206,10 @@ export class Labeler {
   }
 
   prepareNewLabels(modules, config) {
-    console.log('config', JSON.stringify(config, null, ''))
     const newLabels = new Set([])
     const labels = Object.keys(config)
+
+    core.startGroup('Evaluating labels')
     labels.forEach(l => {
       let result = false
       modules.forEach(m => {
@@ -220,23 +224,24 @@ export class Labeler {
           }
         }
       })
-      console.log(`Label ${l} match result: ${result ? 'match' : 'no match'}`)
       if (result) newLabels.add(l)
     })
+    core.endGroup()
+
     return newLabels
   }
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
     const labels = newLabels
     let onlyLabel = ''
-    await newLabels.forEach(async l => {
+    for (const l of newLabels) {
       if (strategy.local[l].hasOwnProperty('only') && strategy.local[l]['only']) {
         onlyLabel = l
       }
       if (strategy.local[l].hasOwnProperty('create-if-missing') && strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
         await this.createLabel(owner, repo, ghKey, l)
       }
-    })
+    }
     if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {
