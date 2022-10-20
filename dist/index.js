@@ -21932,6 +21932,8 @@ class Labeler {
   }
 
   setupModules(config, objects) {
+    core.startGroup('Initializing modules')
+
     const modules = []
     const moduleNames = new Set([])
 
@@ -21945,6 +21947,8 @@ class Labeler {
         }
       }
     }
+    core.info(`Module names found: ${Array.from(moduleNames).join(', ')}`)
+
     moduleNames.forEach(m => {
       switch (m) {
         case 'assignee':
@@ -21958,7 +21962,9 @@ class Labeler {
           break
       }
     })
-
+    core.info('Modules initialized:')
+    modules.map((m) => `\t - ${m.constructor.name}`).forEach(core.info)
+    core.endGroup()
     return modules
   }
 
