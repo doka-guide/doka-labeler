@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/core'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as yaml from 'yaml'
+import yaml from 'yaml'
 import fs from 'fs'
 
 import { BaseModule } from './modules/base.js'
@@ -26,7 +26,10 @@ export class Labeler {
 
       const file = fs.readFileSync(configPath || DEFAULT_CONFIG_PATH, 'utf8')
       const labelRules = yaml.parse(file)
-      console.log('Configuration:', labelRules)
+
+      core.startGroup('Configuration')
+      core.info(JSON.stringify(labelRules, null, '  '))
+      core.endGroup()
 
       const owner = this.getOwner()
       const repo = this.getRepository()
@@ -36,7 +39,7 @@ export class Labeler {
       const fileObjects = await this.getFileObjects(owner, repo, pullNumber, token)
       const assignee = this.getAssignee(pullObject)
 
-      const modules = this.setupModules(labelRules, { fileObjects: fileObjects.data, assignee })
+      const modules = this.setupModules(labelRules, { fileObjects, assignee })
       const newLabels = this.prepareNewLabels(modules, labelRules)
       const oldLabels = await this.getOldLabels(owner, repo, pullNumber, token)
       const allLabels = await this.getAllLabels(owner, repo, token)
@@ -68,41 +71,43 @@ export class Labeler {
 
   async getPullObject(owner, repo, prNumber, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+    const response = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
       owner,
       repo,
       pull_number: prNumber
     })
+
+    return response.data
   }
 
   async getFileObjects(owner, repo, prNumber, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    return await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
+    const response = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
       owner,
       repo,
       pull_number: prNumber
     })
+
+    return response.data
   }
 
   async getOldLabels(owner, repo, prNumber, ghKey) {
     const labels = new Set([])
     const octokit = new Octokit({ auth: ghKey })
-    const oldLabelsObject = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+    const { data: oldLabels } = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
       owner,
       repo,
       issue_number: prNumber,
     })
-    for (const key in oldLabelsObject) {
-      if (oldLabelsObject[key].hasOwnProperty('name')) {
-        labels.add(oldLabelsObject[key].name)
-      }
+    for (const label of oldLabels) {
+      if (label.hasOwnProperty('name')) labels.add(label.name)
     }
     return labels
   }
 
   async getAllLabels(owner, repo, ghKey) {
     const octokit = new Octokit({ auth: ghKey })
-    const labelObjects = await octokit.request('GET /repos/{owner}/{repo}/labels', {
+    const { data: labelObjects } = await octokit.request('GET /repos/{owner}/{repo}/labels', {
       owner,
       repo
     })
@@ -129,6 +134,8 @@ export class Labeler {
   }
 
   setupModules(config, objects) {
+    core.startGroup('Modules initialization')
+
     const modules = []
     const moduleNames = new Set([])
 
@@ -142,6 +149,8 @@ export class Labeler {
         }
       }
     }
+    core.info(`Module names found: ${Array.from(moduleNames).join(', ')}`)
+
     moduleNames.forEach(m => {
       switch (m) {
         case 'assignee':
@@ -155,7 +164,9 @@ export class Labeler {
           break
       }
     })
-
+    core.info('Modules initialized:')
+    modules.map((m) => `\t - ${m.constructor.name}`).forEach(core.info)
+    core.endGroup()
     return modules
   }
 
@@ -197,6 +208,8 @@ export class Labeler {
   prepareNewLabels(modules, config) {
     const newLabels = new Set([])
     const labels = Object.keys(config)
+
+    core.startGroup('Evaluating labels')
     labels.forEach(l => {
       let result = false
       modules.forEach(m => {
@@ -213,20 +226,22 @@ export class Labeler {
       })
       if (result) newLabels.add(l)
     })
+    core.endGroup()
+
     return newLabels
   }
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
     const labels = newLabels
     let onlyLabel = ''
-    await newLabels.forEach(async l => {
+    for (const l of newLabels) {
       if (strategy.local[l].hasOwnProperty('only') && strategy.local[l]['only']) {
         onlyLabel = l
       }
       if (strategy.local[l].hasOwnProperty('create-if-missing') && strategy.local[l]['create-if-missing'] && !allLabels.has(l)) {
         await this.createLabel(owner, repo, ghKey, l)
       }
-    })
+    }
     if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {

@@ -30,10 +30,12 @@ export class FrontmatterModule extends BaseModule {
     if (Array.isArray(files)) {
       for (let i = 0; i < files.length; i++) {
         const f = files[i]
-        const meta = this.getFrontmatterObject(f)
-        const result = this.isApplicableValuesForKey(config, meta)
-        if (typeof result === 'boolean' && result) {
-          return true
+        const [isOk, meta] = this.getFrontmatterMeta(f)
+        if (isOk) {
+          const result = this.isApplicableValuesForKey(config, meta)
+          if (typeof result === 'boolean' && result) {
+            return true
+          }
         }
       }
       return false
@@ -57,17 +59,18 @@ export class FrontmatterModule extends BaseModule {
     return fileList
   }
 
-  getFrontmatterObject(filename) {
+  getFrontmatterMeta(filename) {
     try {
       const content = fs.readFileSync(filename, { encoding: 'utf8' })
-      return fm(content).attributes
+      return [true, fm(content).attributes]
     } catch (err) {
       console.error(err)
+      return [false, err]
     }
   }
 
   isApplicableValuesForKey(configValues, metaValues) {
-    if (Array.isArray(configValues) ) {
+    if (Array.isArray(configValues)) {
       for (let i = 0; i < configValues.length; i++) {
         if (metaValues.hasOwnProperty(configValues[i])) {
           return true
