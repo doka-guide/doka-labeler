@@ -5,6 +5,10 @@
   "version": "1.0.0",
   "description": "An action for automatically labelling pull requests",
   "main": "src/main.js",
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "build": "ncc build src/main.js -o dist",
     "test": "ava"
