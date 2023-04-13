@@ -21594,7 +21594,6 @@ class FilesModule extends BaseModule {
 
   hasApplicableFiles(fileObjects, label, caseNumber) {
     if (typeof this.config[label] !== 'object') {
-      console.log('hasApplicableFiles returned undefined, line 23')
       return undefined
     }
     let config = null
@@ -21602,7 +21601,6 @@ class FilesModule extends BaseModule {
       if (this.config[label].hasOwnProperty('files')) {
         config = this.config[label].files
       } else {
-        console.log('hasApplicableFiles returned undefined, line 31')
         return undefined
       }
     } else {
@@ -21610,12 +21608,10 @@ class FilesModule extends BaseModule {
         && this.config[label][caseNumber].hasOwnProperty('files')) {
         config = this.config[label][caseNumber].files
       } else {
-        console.log('hasApplicableFiles returned undefined, line 39')
         return undefined
       }
     }
 
-    console.log(`CONFIG in hasApplicableFiles: ${JSON.stringify(config)}`)
 
     if (typeof config === 'string') {
       return this.areFilesApplicable(fileObjects, label, [config])
@@ -21623,46 +21619,21 @@ class FilesModule extends BaseModule {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
       for (const status of FILE_STATUSES) {
-        console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(status)}`)
-        console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[status])}`)
         if (config.hasOwnProperty(status)) {
           if (typeof config[status] === 'string') {
             const result = this.areFilesApplicable(fileObjects, label, [config[status]], status)
-            console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           } else if (Array.isArray(config[status])) {
             const result = this.areFilesApplicable(fileObjects, label, [...config[status]], status)
-            console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           }
         }
       }
-      // FILE_STATUSES.forEach(s => {
-      //   console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(s)}`)
-      //   console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[s])}`)
-      //   if (config.hasOwnProperty(s)) {
-      //     if (typeof config[s] === 'string') {
-      //       const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
-      //       console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
-      //       if (result) {
-      //         return result
-      //       }
-      //     } else if (Array.isArray(config[s])) {
-      //       const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
-      //       console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
-      //       if (result) {
-      //         return result
-      //       }
-      //     }
-      //   }
-      // })
-      console.log('hasApplicableFiles returned undefined, line 70')
     } else {
-      console.log('hasApplicableFiles returned undefined, line 72')
       return undefined
     }
   }
@@ -21670,7 +21641,6 @@ class FilesModule extends BaseModule {
   areFilesApplicable(fileObjects, label, patterns, status = null) {
     if (Array.isArray(patterns)) {
       let fileList = this.getArrayFromGitHubFiles(fileObjects, status || null)
-      console.log(`FILE LIST in areFilesApplicable: ${JSON.stringify(fileList)}`)
       if (Array.isArray(fileList) && fileList.length > 0) {
         console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
       } else {
@@ -22044,39 +22014,28 @@ class Labeler {
     const labels = Object.keys(config)
 
     core.startGroup('Evaluating labels')
-    console.log(`LABELS in prepareNewLabels: ${JSON.stringify(labels)}`)
     labels.forEach(l => {
-      console.log(`\n\nINDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
       let result = false
       modules.forEach(m => {
         if (m instanceof BaseModule) {
           const labelConfigArray = config[l]
-          console.log(`labelConfigArray in prepareNewLabels: ${JSON.stringify(labelConfigArray)}`)
           if (Array.isArray(labelConfigArray)) {
             labelConfigArray.forEach((_, i) => {
               result = result || m.isApplicable(l, i)
-              console.log(`RESULT 1 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
             })
           } else if (typeof labelConfigArray === 'object') {
             result = result || m.isApplicable(l)
-            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
-            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${result}`)
           }
         }
       })
-      console.log(`RESULT BEFORE newLabels: ${result} for label ${JSON.stringify(l)}`)
       if (result) newLabels.add(l)
     })
-    console.log(`NEW LABELS: ${Array.from(newLabels)}`)
     core.endGroup()
 
     return newLabels
   }
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
-    console.log(`newLabels in collectNewLabels: ${Array.from(newLabels)}`)
-    console.log(`strategy in collectNewLabels: ${JSON.stringify(strategy)}`)
-    console.log(`allLabels in collectNewLabels: ${Array.from(allLabels)}`)
     const labels = newLabels
     let onlyLabel = ''
     for (const l of newLabels) {
@@ -22087,7 +22046,6 @@ class Labeler {
         await this.createLabel(owner, repo, ghKey, l)
       }
     }
-    console.log(`ONLY_LABEL in collectNewLabels: ${onlyLabel}`)
     if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {

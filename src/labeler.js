@@ -210,39 +210,28 @@ export class Labeler {
     const labels = Object.keys(config)
 
     core.startGroup('Evaluating labels')
-    console.log(`LABELS in prepareNewLabels: ${JSON.stringify(labels)}`)
     labels.forEach(l => {
-      console.log(`\n\nINDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
       let result = false
       modules.forEach(m => {
         if (m instanceof BaseModule) {
           const labelConfigArray = config[l]
-          console.log(`labelConfigArray in prepareNewLabels: ${JSON.stringify(labelConfigArray)}`)
           if (Array.isArray(labelConfigArray)) {
             labelConfigArray.forEach((_, i) => {
               result = result || m.isApplicable(l, i)
-              console.log(`RESULT 1 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
             })
           } else if (typeof labelConfigArray === 'object') {
             result = result || m.isApplicable(l)
-            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
-            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${result}`)
           }
         }
       })
-      console.log(`RESULT BEFORE newLabels: ${result} for label ${JSON.stringify(l)}`)
       if (result) newLabels.add(l)
     })
-    console.log(`NEW LABELS: ${Array.from(newLabels)}`)
     core.endGroup()
 
     return newLabels
   }
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
-    console.log(`newLabels in collectNewLabels: ${Array.from(newLabels)}`)
-    console.log(`strategy in collectNewLabels: ${JSON.stringify(strategy)}`)
-    console.log(`allLabels in collectNewLabels: ${Array.from(allLabels)}`)
     const labels = newLabels
     let onlyLabel = ''
     for (const l of newLabels) {
@@ -253,7 +242,6 @@ export class Labeler {
         await this.createLabel(owner, repo, ghKey, l)
       }
     }
-    console.log(`ONLY_LABEL in collectNewLabels: ${onlyLabel}`)
     if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {

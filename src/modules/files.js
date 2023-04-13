@@ -20,7 +20,6 @@ export class FilesModule extends BaseModule {
 
   hasApplicableFiles(fileObjects, label, caseNumber) {
     if (typeof this.config[label] !== 'object') {
-      console.log('hasApplicableFiles returned undefined, line 23')
       return undefined
     }
     let config = null
@@ -28,7 +27,6 @@ export class FilesModule extends BaseModule {
       if (this.config[label].hasOwnProperty('files')) {
         config = this.config[label].files
       } else {
-        console.log('hasApplicableFiles returned undefined, line 31')
         return undefined
       }
     } else {
@@ -36,12 +34,10 @@ export class FilesModule extends BaseModule {
         && this.config[label][caseNumber].hasOwnProperty('files')) {
         config = this.config[label][caseNumber].files
       } else {
-        console.log('hasApplicableFiles returned undefined, line 39')
         return undefined
       }
     }
 
-    console.log(`CONFIG in hasApplicableFiles: ${JSON.stringify(config)}`)
 
     if (typeof config === 'string') {
       return this.areFilesApplicable(fileObjects, label, [config])
@@ -49,46 +45,21 @@ export class FilesModule extends BaseModule {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
       for (const status of FILE_STATUSES) {
-        console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(status)}`)
-        console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[status])}`)
         if (config.hasOwnProperty(status)) {
           if (typeof config[status] === 'string') {
             const result = this.areFilesApplicable(fileObjects, label, [config[status]], status)
-            console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           } else if (Array.isArray(config[status])) {
             const result = this.areFilesApplicable(fileObjects, label, [...config[status]], status)
-            console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           }
         }
       }
-      // FILE_STATUSES.forEach(s => {
-      //   console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(s)}`)
-      //   console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[s])}`)
-      //   if (config.hasOwnProperty(s)) {
-      //     if (typeof config[s] === 'string') {
-      //       const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
-      //       console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
-      //       if (result) {
-      //         return result
-      //       }
-      //     } else if (Array.isArray(config[s])) {
-      //       const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
-      //       console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
-      //       if (result) {
-      //         return result
-      //       }
-      //     }
-      //   }
-      // })
-      console.log('hasApplicableFiles returned undefined, line 70')
     } else {
-      console.log('hasApplicableFiles returned undefined, line 72')
       return undefined
     }
   }
@@ -96,7 +67,6 @@ export class FilesModule extends BaseModule {
   areFilesApplicable(fileObjects, label, patterns, status = null) {
     if (Array.isArray(patterns)) {
       let fileList = this.getArrayFromGitHubFiles(fileObjects, status || null)
-      console.log(`FILE LIST in areFilesApplicable: ${JSON.stringify(fileList)}`)
       if (Array.isArray(fileList) && fileList.length > 0) {
         console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
       } else {
