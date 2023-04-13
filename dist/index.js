@@ -21612,27 +21612,27 @@ class FilesModule extends BaseModule {
       }
     }
 
+
     if (typeof config === 'string') {
       return this.areFilesApplicable(fileObjects, label, [config])
     } else if (Array.isArray(config)) {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
-      FILE_STATUSES.forEach(s => {
-        if (config.hasOwnProperty(s)) {
-          if (typeof config[s] === 'string') {
-            const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+      for (const status of FILE_STATUSES) {
+        if (config.hasOwnProperty(status)) {
+          if (typeof config[status] === 'string') {
+            const result = this.areFilesApplicable(fileObjects, label, [config[status]], status)
             if (result) {
               return result
             }
-          } else if (Array.isArray(config[s])) {
-            const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+          } else if (Array.isArray(config[status])) {
+            const result = this.areFilesApplicable(fileObjects, label, [...config[status]], status)
             if (result) {
               return result
             }
           }
         }
-      })
-
+      }
     } else {
       return undefined
     }
