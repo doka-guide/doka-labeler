@@ -212,7 +212,7 @@ export class Labeler {
     core.startGroup('Evaluating labels')
     console.log(`LABELS in prepareNewLabels: ${JSON.stringify(labels)}`)
     labels.forEach(l => {
-      console.log(`INDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
+      console.log(`\n\nINDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
       let result = false
       modules.forEach(m => {
         if (m instanceof BaseModule) {
