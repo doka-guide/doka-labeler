@@ -1,6 +1,6 @@
-name: 'Doka Labeler'
+name: 'PR Labeler'
 description: 'Automatically label new pull requests based on the paths of files being changed'
-author: 'Doka'
+author: 'Andrei Kashchikhin'
 
 inputs:
   token:
@@ -20,5 +20,5 @@ branding:
   color: 'gray-dark'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
