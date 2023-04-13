@@ -226,6 +226,7 @@ export class Labeler {
       })
       if (result) newLabels.add(l)
     })
+    console.log(`NEW LABELS: ${JSON.stringify(newLabels)}`)
     core.endGroup()
 
     return newLabels
