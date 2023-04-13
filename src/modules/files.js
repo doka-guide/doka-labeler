@@ -67,7 +67,7 @@ export class FilesModule extends BaseModule {
           }
         }
       })
-
+      console.log('hasApplicableFiles returned undefined, line 70')
     } else {
       console.log('hasApplicableFiles returned undefined, line 72')
       return undefined

@@ -21641,7 +21641,7 @@ class FilesModule extends BaseModule {
           }
         }
       })
-
+      console.log('hasApplicableFiles returned undefined, line 70')
     } else {
       console.log('hasApplicableFiles returned undefined, line 72')
       return undefined
@@ -22041,6 +22041,7 @@ class Labeler {
           } else if (typeof labelConfigArray === 'object') {
             result = result || m.isApplicable(l)
             console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
+            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${result}`)
           }
         }
       })
