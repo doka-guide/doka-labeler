@@ -21622,25 +21622,44 @@ class FilesModule extends BaseModule {
     } else if (Array.isArray(config)) {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
-      FILE_STATUSES.forEach(s => {
-        console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(s)}`)
-        console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[s])}`)
-        if (config.hasOwnProperty(s)) {
-          if (typeof config[s] === 'string') {
-            const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+      for (const status of FILE_STATUSES) {
+        console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(status)}`)
+        console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[status])}`)
+        if (config.hasOwnProperty(status)) {
+          if (typeof config[status] === 'string') {
+            const result = this.areFilesApplicable(fileObjects, label, [config[status]], status)
             console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
-          } else if (Array.isArray(config[s])) {
-            const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+          } else if (Array.isArray(config[status])) {
+            const result = this.areFilesApplicable(fileObjects, label, [...config[status]], status)
             console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           }
         }
-      })
+      }
+      // FILE_STATUSES.forEach(s => {
+      //   console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(s)}`)
+      //   console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[s])}`)
+      //   if (config.hasOwnProperty(s)) {
+      //     if (typeof config[s] === 'string') {
+      //       const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+      //       console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
+      //       if (result) {
+      //         return result
+      //       }
+      //     } else if (Array.isArray(config[s])) {
+      //       const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+      //       console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
+      //       if (result) {
+      //         return result
+      //       }
+      //     }
+      //   }
+      // })
       console.log('hasApplicableFiles returned undefined, line 70')
     } else {
       console.log('hasApplicableFiles returned undefined, line 72')
