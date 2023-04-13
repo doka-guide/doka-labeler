@@ -229,15 +229,19 @@ export class Labeler {
           }
         }
       })
+      console.log(`RESULT BEFORE newLabels: ${result} for label ${JSON.stringify(l)}`)
       if (result) newLabels.add(l)
     })
-    console.log(`NEW LABELS: ${JSON.stringify(newLabels)}`)
+    console.log(`NEW LABELS: ${Array.from(newLabels)}`)
     core.endGroup()
 
     return newLabels
   }
 
   async collectNewLabels(owner, repo, ghKey, allLabels, newLabels, strategy) {
+    console.log(`newLabels in collectNewLabels: ${Array.from(newLabels)}`)
+    console.log(`strategy in collectNewLabels: ${JSON.stringify(strategy)}`)
+    console.log(`allLabels in collectNewLabels: ${Array.from(allLabels)}`)
     const labels = newLabels
     let onlyLabel = ''
     for (const l of newLabels) {
@@ -248,6 +252,7 @@ export class Labeler {
         await this.createLabel(owner, repo, ghKey, l)
       }
     }
+    console.log(`ONLY_LABEL in collectNewLabels: ${onlyLabel}`)
     if (onlyLabel !== '') {
       newLabels.forEach(l => {
         if (l !== onlyLabel) {
