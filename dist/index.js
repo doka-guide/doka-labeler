@@ -21594,6 +21594,7 @@ class FilesModule extends BaseModule {
 
   hasApplicableFiles(fileObjects, label, caseNumber) {
     if (typeof this.config[label] !== 'object') {
+      console.log('hasApplicableFiles returned undefined, line 23')
       return undefined
     }
     let config = null
@@ -21601,6 +21602,7 @@ class FilesModule extends BaseModule {
       if (this.config[label].hasOwnProperty('files')) {
         config = this.config[label].files
       } else {
+        console.log('hasApplicableFiles returned undefined, line 31')
         return undefined
       }
     } else {
@@ -21608,6 +21610,7 @@ class FilesModule extends BaseModule {
         && this.config[label][caseNumber].hasOwnProperty('files')) {
         config = this.config[label][caseNumber].files
       } else {
+        console.log('hasApplicableFiles returned undefined, line 39')
         return undefined
       }
     }
@@ -21640,6 +21643,7 @@ class FilesModule extends BaseModule {
       })
 
     } else {
+      console.log('hasApplicableFiles returned undefined, line 72')
       return undefined
     }
   }
