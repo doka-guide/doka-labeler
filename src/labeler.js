@@ -210,17 +210,22 @@ export class Labeler {
     const labels = Object.keys(config)
 
     core.startGroup('Evaluating labels')
+    console.log(`LABELS in prepareNewLabels: ${JSON.stringify(labels)}`)
     labels.forEach(l => {
+      console.log(`INDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
       let result = false
       modules.forEach(m => {
         if (m instanceof BaseModule) {
           const labelConfigArray = config[l]
+          console.log(`labelConfigArray in prepareNewLabels: ${JSON.stringify(labelConfigArray)}`)
           if (Array.isArray(labelConfigArray)) {
             labelConfigArray.forEach((_, i) => {
               result = result || m.isApplicable(l, i)
+              console.log(`RESULT 1 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
             })
           } else if (typeof labelConfigArray === 'object') {
             result = result || m.isApplicable(l)
+            console.log(`RESULT 2 for ${JSON.stringify(l)} in prepareNewLabels: ${JSON.stringify(result)}`)
           }
         }
       })
