@@ -21612,20 +21612,26 @@ class FilesModule extends BaseModule {
       }
     }
 
+    console.log(`CONFIG in hasApplicableFiles: ${JSON.stringify(config)}`)
+
     if (typeof config === 'string') {
       return this.areFilesApplicable(fileObjects, label, [config])
     } else if (Array.isArray(config)) {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
       FILE_STATUSES.forEach(s => {
+        console.log(`\n FILE_STATUS in hasApplicableFiles: ${JSON.stringify(s)}`)
+        console.log(`\n CONFIG for FILE_STATUS in hasApplicableFiles: ${JSON.stringify(config[s])}`)
         if (config.hasOwnProperty(s)) {
           if (typeof config[s] === 'string') {
             const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
+            console.log(`RESULT 1 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
           } else if (Array.isArray(config[s])) {
             const result = this.areFilesApplicable(fileObjects, label, [...config[s]], s)
+            console.log(`RESULT 2 in hasApplicableFiles: ${JSON.stringify(result)}`)
             if (result) {
               return result
             }
@@ -21641,6 +21647,7 @@ class FilesModule extends BaseModule {
   areFilesApplicable(fileObjects, label, patterns, status = null) {
     if (Array.isArray(patterns)) {
       let fileList = this.getArrayFromGitHubFiles(fileObjects, status || null)
+      console.log(`FILE LIST in areFilesApplicable: ${JSON.stringify(fileList)}`)
       if (Array.isArray(fileList) && fileList.length > 0) {
         console.log(`Module — ${this.MODULE_KEY}, label - ${label}:`)
       } else {
@@ -22016,7 +22023,7 @@ class Labeler {
     core.startGroup('Evaluating labels')
     console.log(`LABELS in prepareNewLabels: ${JSON.stringify(labels)}`)
     labels.forEach(l => {
-      console.log(`INDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
+      console.log(`\n\nINDIVIDUAL LABEL in prepareNewLabels: ${JSON.stringify(l)}`)
       let result = false
       modules.forEach(m => {
         if (m instanceof BaseModule) {
