@@ -1,6 +1,6 @@
-name: 'PR Labeler'
+name: 'Doka Labeler'
 description: 'Automatically label new pull requests based on the paths of files being changed'
-author: 'Andrei Kashchikhin'
+author: 'Doka'
 
 inputs:
   token:
