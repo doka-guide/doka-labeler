@@ -182,3 +182,40 @@ test('Folders are considered correctly with globs in the configurations', t => {
   t.is(module.isApplicable('any'), true)
   t.is(module.isApplicable('css'), false)
 })
+
+test('Files are considered correctly with statuses in the configurations', t => {
+  const objects = [
+    {
+      'filename': 'css/article/index.md',
+      'status': 'modified'
+    },
+    {
+      'filename': 'css/article/demos/base/index.html',
+      'status': 'added'
+    }
+  ]
+  const config = {
+    improvement: {
+      files: {
+        removed: 'css/**/*.md',
+        modified: ['html/**/*.md', 'css/**/*.md']
+      }
+    },
+    demo: {
+      files: {
+        modified: 'css/**/demos/**/*.html'
+      }
+    },
+    newDemo: {
+      files: {
+        added: ['css/**/demos/**/*.html']
+      }
+    }
+  }
+
+  const module = new FilesModule(objects, config)
+
+  t.is(module.isApplicable('improvement'), true)
+  t.is(module.isApplicable('demo'), false)
+  t.is(module.isApplicable('newDemo'), true)
+})

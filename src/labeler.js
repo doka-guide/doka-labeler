@@ -211,18 +211,22 @@ export class Labeler {
 
     core.startGroup('Evaluating labels')
     labels.forEach(l => {
-      let result = false
-      modules.forEach(m => {
-        if (m instanceof BaseModule) {
-          const labelConfigArray = config[l]
-          if (Array.isArray(labelConfigArray)) {
-            labelConfigArray.forEach((_, i) => {
-              result = result || m.isApplicable(l, i)
-            })
-          } else if (typeof labelConfigArray === 'object') {
-            result = result || m.isApplicable(l)
-          }
-        }
+      const labelConfig = config[l]
+      let cases = []
+      if (Array.isArray(labelConfig)) {
+        cases = labelConfig.map((_, i) => i)
+      } else if (typeof labelConfig === 'object') {
+        cases = [null]
+      }
+      // Варианты в массиве складываются через OR, условия внутри варианта —
+      // через AND, как обещает README. `undefined` от модуля значит, что
+      // такого условия у ярлыка нет, и оно не учитывается.
+      const result = cases.some(i => {
+        const results = modules
+          .filter(m => m instanceof BaseModule)
+          .map(m => i === null ? m.isApplicable(l) : m.isApplicable(l, i))
+          .filter(r => r !== undefined)
+        return results.length > 0 && results.every(Boolean)
       })
       if (result) newLabels.add(l)
     })

@@ -125,3 +125,47 @@ test('calling methods queue gives labels from the config and objects', t => {
   const newLabels = labeler.prepareNewLabels(modules, config)
   t.deepEqual(newLabels, new Set(['label1']))
 })
+
+test('label is added only when all its conditions match', t => {
+  const fileObjects = [
+    {
+      "filename": "file1.txt",
+      "status": "added"
+    }
+  ]
+  const assignee = [
+    {
+      "login": "user1"
+    }
+  ]
+  const objects = { fileObjects, assignee }
+  const config = {
+    bothMatch: {
+      files: '*.txt',
+      assignee: 'user1'
+    },
+    filesOnly: {
+      files: '*.txt',
+      assignee: 'user2'
+    },
+    assigneeOnly: {
+      files: { modified: '*.txt' },
+      assignee: 'user1'
+    },
+    anyCase: [
+      {
+        files: '*.md',
+        assignee: 'user1'
+      },
+      {
+        files: '*.txt'
+      }
+    ]
+  }
+
+  const labeler = new Labeler()
+  const modules = labeler.setupModules(config, objects)
+
+  const newLabels = labeler.prepareNewLabels(modules, config)
+  t.deepEqual(newLabels, new Set(['bothMatch', 'anyCase']))
+})

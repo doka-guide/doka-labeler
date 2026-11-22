@@ -43,7 +43,9 @@ export class FilesModule extends BaseModule {
     } else if (Array.isArray(config)) {
       return this.areFilesApplicable(fileObjects, label, [...config])
     } else if (typeof config === 'object') {
-      FILE_STATUSES.forEach(s => {
+      // Обычный цикл, а не forEach: `return` из колбэка forEach не выходит
+      // из функции, и правила со статусами файлов не срабатывали никогда.
+      for (const s of FILE_STATUSES) {
         if (config.hasOwnProperty(s)) {
           if (typeof config[s] === 'string') {
             const result = this.areFilesApplicable(fileObjects, label, [config[s]], s)
@@ -57,8 +59,8 @@ export class FilesModule extends BaseModule {
             }
           }
         }
-      })
-
+      }
+      return false
     } else {
       return undefined
     }
